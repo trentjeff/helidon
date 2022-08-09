@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2019, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package io.helidon.grpc.server;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import io.helidon.common.context.Context;
 import io.helidon.config.Config;
+import io.helidon.config.metadata.Configured;
+import io.helidon.config.metadata.ConfiguredOption;
 import io.helidon.grpc.core.GrpcTlsDescriptor;
-
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
+import io.helidon.tracing.Tracer;
 
 /**
  * The configuration for a gRPC server.
@@ -76,9 +77,9 @@ public interface GrpcServerConfiguration {
     boolean useNativeTransport();
 
     /**
-     * Returns an <a href="http://opentracing.io">opentracing.io</a> tracer. Default is {@link GlobalTracer}.
+     * Returns a {@link io.helidon.tracing.Tracer}. Default is {@link io.helidon.tracing.Tracer#global()}.
      *
-     * @return a tracer to use - never {@code null} (defaulting to {@link GlobalTracer}
+     * @return a tracer to use - never {@code null}
      */
     Tracer tracer();
 
@@ -147,6 +148,7 @@ public interface GrpcServerConfiguration {
     /**
      * A {@link GrpcServerConfiguration} builder.
      */
+    @Configured
     final class Builder implements io.helidon.common.Builder<Builder, GrpcServerConfiguration> {
         private static final AtomicInteger GRPC_SERVER_COUNTER = new AtomicInteger(1);
 
@@ -175,6 +177,10 @@ public interface GrpcServerConfiguration {
          * @param config configuration instance
          * @return updated builder
          */
+        @ConfiguredOption(key = "native",
+                type = Boolean.class,
+                value = "false",
+                description = "Specify if native transport should be used.")
         public Builder config(Config config) {
             if (config == null) {
                 return this;
@@ -197,6 +203,7 @@ public interface GrpcServerConfiguration {
          *
          * @return an updated builder
          */
+        @ConfiguredOption(key = "name", value = DEFAULT_NAME)
         public Builder name(String name) {
             this.name = name == null ? null : name.trim();
             return this;
@@ -210,6 +217,7 @@ public interface GrpcServerConfiguration {
          * @param port the server port
          * @return an updated builder
          */
+        @ConfiguredOption(value = "" + DEFAULT_PORT)
         public Builder port(int port) {
             this.port = port < 0 ? 0 : port;
             return this;
@@ -226,25 +234,26 @@ public interface GrpcServerConfiguration {
         }
 
         /**
-         * Sets an <a href="http://opentracing.io">opentracing.io</a> tracer.
-         * (Default is {@link GlobalTracer}.)
+         * Sets a tracer.
          *
          * @param tracer a tracer to set
          * @return an updated builder
          */
         public Builder tracer(Tracer tracer) {
+            Objects.requireNonNull(tracer);
             this.tracer = tracer;
             return this;
         }
 
         /**
-         * Sets an <a href="http://opentracing.io">opentracing.io</a> tracer. (Default is {@link GlobalTracer}.)
+         * Sets a Tracer.
          *
          * @param tracerBuilder a tracer builder to set; will be built as a first step of this method execution
          * @return updated builder
          */
         public Builder tracer(Supplier<? extends Tracer> tracerBuilder) {
-            this.tracer = tracerBuilder != null ? tracerBuilder.get() : null;
+            Objects.requireNonNull(tracerBuilder);
+            this.tracer = tracerBuilder.get();
             return this;
         }
 
@@ -268,6 +277,7 @@ public interface GrpcServerConfiguration {
          * @param workers a workers count
          * @return an updated builder
          */
+        @ConfiguredOption(key = "workers", value = "Number of processors available to the JVM")
         public Builder workersCount(int workers) {
             this.workers = workers;
             return this;
@@ -339,7 +349,7 @@ public interface GrpcServerConfiguration {
             }
 
             if (tracer == null) {
-                tracer = GlobalTracer.get();
+                tracer = Tracer.global();
             }
 
             if (tracingConfig == null) {

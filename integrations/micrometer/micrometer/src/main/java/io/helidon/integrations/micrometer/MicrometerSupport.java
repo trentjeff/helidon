@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2021, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import io.helidon.config.Config;
+import io.helidon.config.metadata.Configured;
 import io.helidon.servicecommon.rest.HelidonRestServiceSupport;
 import io.helidon.webserver.Handler;
 import io.helidon.webserver.Routing;
@@ -119,13 +120,14 @@ public class MicrometerSupport extends HelidonRestServiceSupport {
     /**
      * Fluid builder for {@code MicrometerSupport} objects.
      */
+    @Configured(prefix = "micrometer")
     public static class Builder extends HelidonRestServiceSupport.Builder<Builder, MicrometerSupport>
             implements io.helidon.common.Builder<Builder, MicrometerSupport> {
 
         private Supplier<MeterRegistryFactory> meterRegistryFactorySupplier = null;
 
         private Builder() {
-            super(Builder.class, DEFAULT_CONTEXT);
+            super(DEFAULT_CONTEXT);
         }
 
         @Override

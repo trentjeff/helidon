@@ -12,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 package io.helidon.jersey.client;
@@ -59,9 +58,7 @@ public class ContextTest {
     static void beforeAll() {
         server = WebServer.builder()
                 .host("localhost")
-                .routing(Routing.builder()
-                        .put((req, res) -> res.send("I'm Frank!"))
-                        .build())
+                .routing(r -> r.put((req, res) -> res.send("I'm Frank!")))
                 .build()
                 .start()
                 .await(TIME_OUT);

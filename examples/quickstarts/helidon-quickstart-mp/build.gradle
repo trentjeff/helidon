@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ version = '1.0-SNAPSHOT'
 
 description = """helidon-quickstart-mp"""
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 17
+targetCompatibility = 17
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 ext {
-    helidonversion = '3.0.0-SNAPSHOT'
+    helidonversion = '3.0.1-SNAPSHOT'
     mainClass='io.helidon.microprofile.cdi.Main'
 }
 
@@ -51,6 +51,7 @@ dependencies {
     runtimeOnly 'org.jboss:jandex'
     runtimeOnly 'jakarta.activation:jakarta.activation-api'
 
+    testImplementation 'io.helidon.microprofile.tests:helidon-microprofile-tests-junit5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
@@ -98,5 +99,7 @@ task moveBeansXML {
                  todir: "${buildDir}/classes/java/main/META-INF"
     }
 }
+compileTestJava.dependsOn jandex
+jar.dependsOn jandex
 test.dependsOn moveBeansXML
 run.dependsOn moveBeansXML

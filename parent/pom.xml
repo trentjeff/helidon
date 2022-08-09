@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.helidon</groupId>
     <artifactId>helidon-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Helidon Parent</name>
@@ -115,6 +115,31 @@
             <email>david.k.kral@oracle.com</email>
             <organization>Oracle Corporation</organization>
         </developer>
+        <developer>
+            <name>Daniel Kec</name>
+            <email>daniel.kec@oracle.com</email>
+            <organization>Oracle Corporation</organization>
+        </developer>
+        <developer>
+            <name>Arjav Desai</name>
+            <email>arjav.desai@oracle.com</email>
+            <organization>Oracle Corporation</organization>
+        </developer>
+        <developer>
+            <name>Keith Lustria</name>
+            <email>keith.lustria@oracle.com</email>
+            <organization>Oracle Corporation</organization>
+        </developer>
+        <developer>
+            <name>Dmitry Aleksandrov</name>
+            <email>dmitry.aleksandrov@oracle.com</email>
+            <organization>Oracle Corporation</organization>
+        </developer>
+        <developer>
+            <name>Jeff Trent</name>
+            <email>jeff.trent@oracle.com</email>
+            <organization>Oracle Corporation</organization>
+        </developer>
     </developers>
 
     <properties>
@@ -122,7 +147,7 @@
         <version.plugin.deploy>2.8.2</version.plugin.deploy>
         <version.plugin.gpg>1.6</version.plugin.gpg>
         <version.plugin.install>3.0.0-M1</version.plugin.install>
-        <version.plugin.nexus-staging>1.6.7</version.plugin.nexus-staging>
+        <version.plugin.nexus-staging>1.6.13</version.plugin.nexus-staging>
         <version.plugin.site>3.8.2</version.plugin.site>
         <version.plugin.versions>2.7</version.plugin.versions>
     </properties>

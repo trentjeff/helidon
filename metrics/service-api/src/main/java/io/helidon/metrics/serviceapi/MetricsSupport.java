@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2021, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package io.helidon.metrics.serviceapi;
 
 import io.helidon.config.Config;
+import io.helidon.config.metadata.Configured;
 import io.helidon.config.metadata.ConfiguredOption;
 import io.helidon.metrics.api.MetricsSettings;
 import io.helidon.servicecommon.rest.RestServiceSettings;
@@ -57,15 +58,25 @@ public interface MetricsSupport extends RestServiceSupport, Service {
     }
 
     /**
-     * Creates a new {@code MetricsSupport} instance using the specified metrics settings.
+     * Creates a new {@code MetricsSupport} instance using the specified metrics settings and REST service settings.
      *
      * @param metricsSettings metrics settings to use in initializing the metrics support
      * @param restServiceSettings REST service settings for the metrics endpoint
      *
-     * @return new metrics support using specified metrics settings
+     * @return new metrics support using specified metrics settings and REST service settings
      */
     static MetricsSupport create(MetricsSettings metricsSettings, RestServiceSettings restServiceSettings) {
         return MetricsSupportManager.create(metricsSettings, restServiceSettings);
+    }
+
+    /**
+     * Creates a new {@code MetricsSupport} instance using the specified metrics settings and defaulted REST service settings.
+     *
+     * @param metricsSettings metrics settings to use in initializing the metrics support
+     * @return new metrics support using the specified metrics settings
+     */
+    static MetricsSupport create(MetricsSettings metricsSettings) {
+        return create(metricsSettings, defaultedMetricsRestServiceSettingsBuilder().build());
     }
 
     /**
@@ -79,6 +90,15 @@ public interface MetricsSupport extends RestServiceSupport, Service {
                                             defaultedMetricsRestServiceSettingsBuilder()
                                                     .config(config)
                                                     .build());
+    }
+
+    /**
+     * Returns a builder for the highest-priority {@code MetricsSupport} implementation.
+     *
+     * @return builder for {@code MetricsSupport}
+     */
+    static MetricsSupport.Builder<?, ?> builder() {
+        return MetricsSupportManager.builder();
     }
 
     /**
@@ -132,6 +152,8 @@ public interface MetricsSupport extends RestServiceSupport, Service {
      * @param <B> builder type
      * @param <T> specific implementation type of {@code MetricsSupport}
      */
+
+    @Configured
     interface Builder<B extends Builder<B, T>, T extends MetricsSupport> extends io.helidon.common.Builder<B, T> {
 
         /**
@@ -147,6 +169,8 @@ public interface MetricsSupport extends RestServiceSupport, Service {
          * @param metricsSettingsBuilder the metrics settings to assign for use in building the {@code MetricsSupport} instance
          * @return updated builder
          */
+        @ConfiguredOption(mergeWithParent = true,
+                          type = MetricsSettings.class)
         B metricsSettings(MetricsSettings.Builder metricsSettingsBuilder);
 
         /**
@@ -156,7 +180,7 @@ public interface MetricsSupport extends RestServiceSupport, Service {
          * @return updated builder
          */
         @ConfiguredOption(mergeWithParent = true,
-                          kind = ConfiguredOption.Kind.MAP)
+                          type = RestServiceSettings.class)
         B restServiceSettings(RestServiceSettings.Builder restServiceSettingsBuilder);
     }
 }

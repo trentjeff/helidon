@@ -395,7 +395,7 @@ public class Jwt {
      * Add validator of audience to the collection of validators.
      *
      * @param validators collection of validators
-     * @param audience   audience expected to be in the token
+     * @param audience   audience expected to be in the token, never null
      * @param mandatory  whether the audience field is mandatory in the token
      */
     public static void addAudienceValidator(Collection<Validator<Jwt>> validators, String audience, boolean mandatory) {
@@ -917,7 +917,7 @@ public class Jwt {
      * @return errors instance to check for validation result
      */
     public Errors validate(String issuer, String audience) {
-        return validate(issuer, Set.of(audience));
+        return validate(issuer, audience == null ? Set.of() : Set.of(audience));
     }
 
     /**
@@ -1563,18 +1563,6 @@ public class Jwt {
             }
             this.audience.add(audience);
             return this;
-        }
-
-        /**
-         * Add audience.
-         *
-         * @param audience audience to add
-         * @return updated builder
-         * @deprecated use {@link #addAudience(String)} or {@link #audience(java.util.List)} instead
-         */
-        @Deprecated(forRemoval = true, since = "2.4.0")
-        public Builder audience(String audience) {
-            return addAudience(audience);
         }
 
         /**

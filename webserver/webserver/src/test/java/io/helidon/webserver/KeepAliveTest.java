@@ -12,9 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-
 package io.helidon.webserver;
 
 import java.nio.ByteBuffer;
@@ -45,6 +43,8 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 
 public class KeepAliveTest {
+
+    private static final Duration TIMEOUT = Duration.ofSeconds(60);
     private static WebServer server;
     private static WebClient webClient;
 
@@ -52,7 +52,7 @@ public class KeepAliveTest {
     static void setUp() {
         LogConfig.configureRuntime();
         server = WebServer.builder()
-                .routing(Routing.builder()
+                .routing(r -> r
                                  .register("/close", rules -> rules.any((req, res) -> {
                                      req.content().forEach(dataChunk -> {
                                          // consume only first from two chunks
@@ -66,9 +66,9 @@ public class KeepAliveTest {
                                              .onComplete(res::send)
                                              .ignoreElement();
                                  }))
-                                 .build())
+                )
                 .build();
-        server.start().await();
+        server.start().await(TIMEOUT);
         String serverUrl = "http://localhost:" + server.port();
         webClient = WebClient.builder()
                 .baseUri(serverUrl)
@@ -116,7 +116,7 @@ public class KeepAliveTest {
                                     .map(ByteBuffer::wrap)
                                     .map(bb -> DataChunk.create(true, true, bb))
                     )
-                    .await(Duration.ofMinutes(5));
+                    .await(TIMEOUT);
 
             assertThat(res.status().code(), is(expectedStatus));
             if (expectedConnectionHeader != null) {

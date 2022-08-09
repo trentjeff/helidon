@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.helidon.microprofile.messaging</groupId>
         <artifactId>helidon-microprofile-messaging-project</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>helidon-microprofile-messaging</artifactId>
@@ -56,6 +56,11 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.helidon.messaging.mock</groupId>
+            <artifactId>helidon-messaging-mock</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

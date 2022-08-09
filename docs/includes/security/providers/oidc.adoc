@@ -1,0 +1,86 @@
+///////////////////////////////////////////////////////////////////////////////
+
+    Copyright (c) 2018, 2022 Oracle and/or its affiliates.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+///////////////////////////////////////////////////////////////////////////////
+
+ifndef::rootdir[:rootdir: {docdir}/../../..]
+
+:basic-table-intro: The table below lists the configuration keys that identify the CORS characteristics.
+:cors-config-key-explanation: , identified with the configuration key 'cors',
+:cors-config-table-exclude-methods: true
+:feature-name: OIDC Security Provider
+
+include::{rootdir}/config/io_helidon_security_providers_oidc_OidcProvider.adoc[leveloffset=+2,tag=config]
+
+=== Example code
+See the link:{helidon-github-tree-url}/examples/security/idcs-login[example] on GitHub.
+
+[source,yaml]
+.Configuration example
+----
+security:
+  providers:
+  - oidc:
+      client-id: "client-id-of-this-service"
+      client-secret: "${CLEAR=client-secret-of-this-service}"
+      identity-uri: "http://your-tenant.identity-server.com"
+      frontend-uri: "http://my-service:8080"
+      audience: "http://my-service"
+      cors:
+        allow-origins: ["http://foo.com", "http://there.com"]
+        allow-methods: ["PUT", "DELETE"]
+      outbound:
+        - name: "internal-services"
+          hosts: ["*.example.org"]
+          outbound-token:
+            header: "X-Internal-Auth"
+----
+
+=== How does it work?
+At Helidon startup, if OIDC provider is configured, the following will happen:
+
+1. `client-id`, `client-secret`, and `identityUri` are validated - these must provide values
+2. Unless all resources are configured as local resources, the provider attempts
+to contact the `oidc-metadata.resource` endpoint to retrieve all endpoints
+
+At runtime, depending on configuration...
+
+If a request comes without a token or with insufficient scopes:
+
+1. If `redirect` is set to `true` (default), request is redirected to the authorization
+endpoint of the identity server. If set to false, `401` is returned
+2. User authenticates against the identity server
+3. The identity server redirects back to Helidon service with a code
+4. Helidon service contacts the identity server's token endpoint, to exchange the code
+for a JWT
+5. The JWT is stored in a cookie (if cookie support is enabled, which it is by default)
+6. Helidon service redirects to original endpoint (on itself)
+
+Helidon obtains a token from request (from cookie, header, or query parameter):
+
+1. Token is parsed as a singed JWT
+2. We validate the JWT signature either against local JWK or against the identity server's
+introspection endpoint depending on configuration
+3. We validate the issuer and audience of the token if it matches the configured values
+4. A subject is created from the JWT, including scopes from the token
+5. We validate that we have sufficient scopes to proceed, and return `403` if not
+6. Handling is returned to security to process other security providers
+
+[[cors]]
+== CORS Settings
+As an experimental feature, you can set up cross-origin handling for the redirect and logout endpoints in an optional `cors` block inside the `oidc` configuration.
+
+include::{rootdir}/includes/cors.adoc[tag=basic-cross-origin-config-no-heading-or-intro]

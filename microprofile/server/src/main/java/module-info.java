@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ module io.helidon.microprofile.server {
     requires transitive jakarta.cdi;
     requires transitive jakarta.ws.rs;
     requires jakarta.interceptor.api;
-    requires jakarta.json;
+    requires transitive jakarta.json;
+    requires io.helidon.jersey.media.jsonp;
 
     requires java.logging;
     requires io.helidon.common.serviceloader;
@@ -40,6 +41,7 @@ module io.helidon.microprofile.server {
     // there is now a hardcoded dependency on Weld, to configure additional bean defining annotation
     requires java.management;
     requires microprofile.config.api;
+    requires io.helidon.config.metadata;
 
     exports io.helidon.microprofile.server;
 
@@ -48,5 +50,5 @@ module io.helidon.microprofile.server {
             io.helidon.microprofile.server.JaxRsCdiExtension;
 
     // needed when running with modules - to make private methods accessible
-    opens io.helidon.microprofile.server to weld.core.impl, io.helidon.microprofile.cdi;
+    opens io.helidon.microprofile.server to weld.core.impl, org.glassfish.hk2.utilities, io.helidon.microprofile.cdi;
 }

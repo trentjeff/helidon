@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.helidon</groupId>
         <artifactId>helidon-dependencies</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>./dependencies/pom.xml</relativePath>
     </parent>
     <artifactId>helidon-project</artifactId>
@@ -55,14 +55,15 @@
         Changing these version requires approval for a new third party dependency!
         -->
         <version.lib.arquillian>1.7.0.Alpha10</version.lib.arquillian>
-        <version.lib.asciidoctor.diagram>1.5.18</version.lib.asciidoctor.diagram>
         <version.lib.asm>6.0</version.lib.asm>
         <version.lib.checkstyle>9.1</version.lib.checkstyle>
         <version.lib.groovy-all>2.4.14</version.lib.groovy-all>
         <!-- Silence javadoc error org.jboss.logging.annotations.Message$Format not found -->
         <version.lib.jboss-logging-annotations>2.2.1.Final</version.lib.jboss-logging-annotations>
+        <version.lib.junit4>4.13.1</version.lib.junit4>
         <version.lib.kafka-junit5>3.2.3</version.lib.kafka-junit5>
-        <version.lib.netty.tcnative>2.0.46.Final</version.lib.netty.tcnative>
+        <version.lib.mockito>2.23.4</version.lib.mockito>
+        <version.lib.netty.tcnative>2.0.52.Final</version.lib.netty.tcnative>
         <version.lib.restito>0.9.1</version.lib.restito>
         <version.lib.rxjava2-jdk9-interop>0.1.0</version.lib.rxjava2-jdk9-interop>
         <version.lib.rxjava>2.2.10</version.lib.rxjava>
@@ -92,13 +93,13 @@
         <version.plugin.checkstyle>3.1.2</version.plugin.checkstyle>
         <version.plugin.compiler>3.8.1</version.plugin.compiler>
         <version.plugin.dependency>3.1.2</version.plugin.dependency>
-        <version.plugin.directory>0.3.1</version.plugin.directory>
+        <version.plugin.directory>1.0</version.plugin.directory>
         <version.plugin.eclipselink>2.7.5.1</version.plugin.eclipselink>
         <version.plugin.enforcer>3.0.0-M1</version.plugin.enforcer>
         <version.plugin.exec>1.6.0</version.plugin.exec>
         <version.plugin.failsafe>3.0.0-M5</version.plugin.failsafe>
         <version.plugin.glassfish-copyright>2.3</version.plugin.glassfish-copyright>
-        <version.plugin.helidon-build-tools>3.0.0-M3</version.plugin.helidon-build-tools>
+        <version.plugin.helidon-build-tools>3.0.0</version.plugin.helidon-build-tools>
         <version.plugin.hibernate-enhance>${version.lib.hibernate}</version.plugin.hibernate-enhance>
         <version.plugin.jacoco>0.8.5</version.plugin.jacoco>
         <version.plugin.jandex>1.1.0</version.plugin.jandex>
@@ -115,14 +116,14 @@
         <version.plugin.source>3.0.1</version.plugin.source>
         <version.plugin.spotbugs>4.4.2.2</version.plugin.spotbugs>
         <version.plugin.findsecbugs>1.11.0</version.plugin.findsecbugs>
-        <version.plugin.dependency-check>6.5.3</version.plugin.dependency-check>
+        <version.plugin.dependency-check>7.1.1</version.plugin.dependency-check>
         <version.plugin.surefire>3.0.0-M5</version.plugin.surefire>
         <version.plugin.toolchains>1.1</version.plugin.toolchains>
         <version.plugin.version-plugin>2.3</version.plugin.version-plugin>
         <version.plugin.buildnumber>1.4</version.plugin.buildnumber>
         <version.plugin.wiremock>2.14.0</version.plugin.wiremock>
 
-        <version.helidon-cli>3.0.0-M3</version.helidon-cli>
+        <version.helidon-cli>3.0.0</version.helidon-cli>
 
         <!-- Links to external javadocs. If you see a hardcoded version it means the javadocs for the version we use is not available. -->
         <javadoc.link.jakarta-jaxrs>https://jakarta.ee/specifications/restful-ws/3.0/apidocs/</javadoc.link.jakarta-jaxrs>
@@ -586,7 +587,7 @@
                     <version>${version.plugin.protobuf}</version>
                     <configuration>
                         <!--suppress UnresolvedMavenProperty -->
-                        <protocArtifact>com.google.protobuf:protoc:3.17.3:exe:${os.detected.classifier}</protocArtifact>
+                        <protocArtifact>com.google.protobuf:protoc:${version.lib.google-protobuf}:exe:${os.detected.classifier}</protocArtifact>
                         <pluginId>grpc-java</pluginId>
                         <!--suppress UnresolvedMavenProperty -->
                         <pluginArtifact>
@@ -613,21 +614,6 @@
                             <groupId>org.apache.maven.doxia</groupId>
                             <artifactId>doxia-site-renderer</artifactId>
                             <version>1.6</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>com.ethlo.persistence.tools</groupId>
-                    <artifactId>eclipselink-maven-plugin</artifactId>
-                    <version>${version.plugin.eclipselink}</version>
-                    <configuration>
-                        <updatePersistenceXml>false</updatePersistenceXml>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.eclipse.persistence</groupId>
-                            <artifactId>org.eclipse.persistence.jpa</artifactId>
-                            <version>${version.lib.eclipselink}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -714,6 +700,15 @@
                     <groupId>uk.co.automatictester</groupId>
                     <artifactId>wiremock-maven-plugin</artifactId>
                     <version>${version.plugin.wiremock}</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.helidon.build-tools</groupId>
+                    <artifactId>sitegen-maven-plugin</artifactId>
+                    <version>${version.plugin.helidon-build-tools}</version>
+                    <configuration>
+                        <siteSourceDirectory>docs</siteSourceDirectory>
+                        <siteConfigFile>docs/sitegen.yaml</siteConfigFile>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>io.helidon.build-tools</groupId>
@@ -868,12 +863,11 @@
                         <artifactId>sitegen-maven-plugin</artifactId>
                         <version>${version.plugin.helidon-build-tools}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctorj-diagram</artifactId>
-                        <version>${version.lib.asciidoctor.diagram}</version>
-                    </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>io.helidon.build-tools</groupId>
+                <artifactId>sitegen-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>io.helidon.build-tools</groupId>
@@ -958,6 +952,11 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-tcnative-boringssl-static</artifactId>
                 <version>${version.lib.netty.tcnative}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${version.lib.mockito}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jgit</groupId>

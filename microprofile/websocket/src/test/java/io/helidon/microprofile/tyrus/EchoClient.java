@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.websocket.ClientEndpointConfig;
@@ -34,6 +35,7 @@ import jakarta.websocket.Extension;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
 import org.glassfish.tyrus.client.ClientManager;
+import org.glassfish.tyrus.container.jdk.client.JdkClientContainer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -44,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class EchoClient {
     private static final Logger LOGGER = Logger.getLogger(EchoClient.class.getName());
 
-    private static final ClientManager client = ClientManager.createClient();
+    private static final ClientManager client = ClientManager.createClient(JdkClientContainer.class.getName());
     private static final long TIMEOUT_SECONDS = 10;
 
     private final URI uri;
@@ -90,7 +92,7 @@ class EchoClient {
                             LOGGER.info("Client OnMessage called '" + message + "'");
 
                             int index = messages.length - (int) messageLatch.getCount();
-                            assertTrue(equals.apply(messages[index], message));
+                            assertTrue(equals.apply(messages[index], message), messages[index] +":"+message);
 
                             messageLatch.countDown();
                             if (messageLatch.getCount() == 0) {
@@ -121,8 +123,7 @@ class EchoClient {
 
             @Override
             public void onError(Session session, Throwable thr) {
-                LOGGER.info("Client OnError called '" + thr + "'");
-
+                LOGGER.log(Level.SEVERE, "Client OnError called '" + thr + "'", thr);
             }
         }, config, uri);
 
@@ -131,5 +132,9 @@ class EchoClient {
         if (!messageLatch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
             fail("Timeout expired without receiving echo of all messages");
         }
+    }
+
+    void shutdown(){
+        client.shutdown();
     }
 }

@@ -68,6 +68,7 @@ import org.eclipse.microprofile.metrics.Metric;
 import org.eclipse.microprofile.metrics.MetricID;
 import org.eclipse.microprofile.metrics.MetricRegistry;
 
+
 /**
  * Support for metrics for Helidon Web Server.
  *
@@ -187,7 +188,9 @@ public final class MetricsSupport extends HelidonRestServiceSupport
      * Create a new builder to construct an instance.
      *
      * @return A new builder instance
+     * @deprecated Use {@link io.helidon.metrics.serviceapi.MetricsSupport#builder()} instead.
      */
+    @Deprecated(since = "2.5.2", forRemoval = true)
     public static Builder builder() {
         return new Builder();
     }
@@ -208,6 +211,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
     }
 
     private static void getAll(ServerRequest req, ServerResponse res, Registry registry) {
+        res.cachingStrategy(ServerResponse.CachingStrategy.NO_CACHING);
         if (registry.empty()) {
             res.status(Http.Status.NO_CONTENT_204);
             res.send();
@@ -232,6 +236,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
             return;
         }
 
+        // Options returns only the metadata, so it's OK to allow caching.
         if (req.headers().isAccepted(MediaType.APPLICATION_JSON)) {
             sendJson(res, toJsonMeta(registry));
         } else {
@@ -515,6 +520,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
     private void getByName(ServerRequest req, ServerResponse res, Registry registry) {
         String metricName = req.path().param("metric");
 
+        res.cachingStrategy(ServerResponse.CachingStrategy.NO_CACHING);
         registry.getOptionalMetricEntry(metricName)
                 .ifPresentOrElse(entry -> {
                     MediaType mediaType = findBestAccepted(req.headers());
@@ -562,6 +568,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
 
     private void getMultiple(ServerRequest req, ServerResponse res, Registry... registries) {
         MediaType mediaType = findBestAccepted(req.headers());
+        res.cachingStrategy(ServerResponse.CachingStrategy.NO_CACHING);
         if (mediaType == MediaType.APPLICATION_JSON) {
             sendJson(res, toJsonData(registries));
         } else if (mediaType == MediaType.TEXT_PLAIN) {
@@ -573,6 +580,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
     }
 
     private void optionsMultiple(ServerRequest req, ServerResponse res, Registry... registries) {
+        // Options returns metadata only, so do not discourage caching.
         if (req.headers().isAccepted(MediaType.APPLICATION_JSON)) {
             sendJson(res, toJsonMeta(registries));
         } else {
@@ -586,6 +594,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
 
         Optional.ofNullable(registry.metadataWithIDs(metricName))
                 .ifPresentOrElse(entry -> {
+                    // Options returns only metadata, so do not discourage caching.
                     if (req.headers().isAccepted(MediaType.APPLICATION_JSON)) {
                         JsonObjectBuilder builder = JSON.createObjectBuilder();
                         // The returned list of metric IDs is guaranteed to have at least one element at this point.
@@ -615,7 +624,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
          * Creates a new builder instance.
          */
         protected Builder() {
-            super(Builder.class, MetricsSettings.Builder.DEFAULT_CONTEXT);
+            super(MetricsSettings.Builder.DEFAULT_CONTEXT);
         }
 
         @Override
@@ -656,7 +665,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
          * performance metrics configuration
          * @deprecated Use {@link #metricsSettings(MetricsSettings.Builder)} instead
          */
-        @Deprecated
+        @Deprecated(since = "2.4.0", forRemoval = true)
         public Builder config(Config config) {
             super.config(config);
             metricsSettingsBuilder.config(config);
@@ -699,7 +708,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
          * {@link MetricsSettings.Builder#keyPerformanceIndicatorSettings(KeyPerformanceIndicatorMetricsSettings.Builder)}
          * instead.
          */
-        @Deprecated
+        @Deprecated(since = "2.4.0", forRemoval = true)
         public Builder keyPerformanceIndicatorsMetricsSettings(KeyPerformanceIndicatorMetricsSettings.Builder builder) {
             this.metricsSettingsBuilder.keyPerformanceIndicatorSettings(builder);
             return this;
@@ -714,7 +723,7 @@ public final class MetricsSupport extends HelidonRestServiceSupport
          * {@link MetricsSettings.Builder#keyPerformanceIndicatorSettings(KeyPerformanceIndicatorMetricsSettings.Builder)}
          * instead.
          */
-        @Deprecated
+        @Deprecated(since = "2.4.0", forRemoval = true)
         public Builder keyPerformanceIndicatorsMetricsConfig(Config kpiConfig) {
             return keyPerformanceIndicatorsMetricsSettings(
                     KeyPerformanceIndicatorMetricsSettings.builder().config(kpiConfig));

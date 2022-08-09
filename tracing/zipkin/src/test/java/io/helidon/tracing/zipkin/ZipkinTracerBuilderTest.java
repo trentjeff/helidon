@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 package io.helidon.tracing.zipkin;
 
+import java.net.URI;
 import java.util.List;
 
 import io.helidon.config.Config;
+import io.helidon.tracing.Span;
 import io.helidon.tracing.Tag;
 import io.helidon.tracing.TracerBuilder;
 
-import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopTracer;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,7 +52,7 @@ class ZipkinTracerBuilderTest {
     void testConfigDefaults() {
         TracerBuilder<?> builder = TracerBuilder.create(config.get("tracing.zipkin-defaults"));
 
-        ZipkinTracerBuilder zBuilder = (ZipkinTracerBuilder) builder;
+        ZipkinTracerBuilder zBuilder =  builder.unwrap(ZipkinTracerBuilder.class);
 
         assertThat(zBuilder.tags(), is(List.of()));
         assertThat(zBuilder.serviceName(), is("helidon-service"));
@@ -65,10 +67,33 @@ class ZipkinTracerBuilderTest {
     }
 
     @Test
+    void testConfigSuppressPort() {
+        /* Make sure if config sets port to -1 that we do not default it to something else */
+        TracerBuilder<?> builder = TracerBuilder.create(config.get("tracing.zipkin-defaults-suppress-port"));
+        ZipkinTracerBuilder zBuilder = builder.unwrap(ZipkinTracerBuilder.class);
+        assertThat(zBuilder.port(), is(-1));
+
+        Tracer tracer = zBuilder.build();
+        assertThat(tracer, notNullValue());
+    }
+
+    @Test
+    void testConfigSuppressPortUri() {
+        /* Create builder using Uri with no port number. Make sure we don't add a port number */
+        TracerBuilder<?> builder = TracerBuilder.create("unit-test-suppress-port-uri")
+                .collectorUri(URI.create("https://localhost/path"));
+        ZipkinTracerBuilder zBuilder = builder.unwrap(ZipkinTracerBuilder.class);
+        assertThat(zBuilder.port(), is(-1));
+
+        Tracer tracer = zBuilder.build();
+        assertThat(tracer, notNullValue());
+    }
+
+    @Test
     void testConfigDisabled() {
         TracerBuilder<?> builder = TracerBuilder.create(config.get("tracing.zipkin-disabled"));
 
-        ZipkinTracerBuilder zBuilder = (ZipkinTracerBuilder) builder;
+        ZipkinTracerBuilder zBuilder = builder.unwrap(ZipkinTracerBuilder.class);
 
         assertThat(zBuilder.tags(), is(List.of()));
         assertThat(zBuilder.serviceName(), is("helidon-service"));
@@ -89,7 +114,7 @@ class ZipkinTracerBuilderTest {
     void testConfigDisabledNoService() {
         TracerBuilder<?> builder = TracerBuilder.create(config.get("tracing.zipkin-disabled-no-service"));
 
-        ZipkinTracerBuilder zBuilder = (ZipkinTracerBuilder) builder;
+        ZipkinTracerBuilder zBuilder = builder.unwrap(ZipkinTracerBuilder.class);
 
         assertThat(zBuilder.tags(), is(List.of()));
         assertThat(zBuilder.serviceName(), nullValue());
@@ -116,7 +141,7 @@ class ZipkinTracerBuilderTest {
     void testConfigCustomized() {
         TracerBuilder<?> builder = TracerBuilder.create(config.get("tracing.zipkin-full"));
 
-        ZipkinTracerBuilder zBuilder = (ZipkinTracerBuilder) builder;
+        ZipkinTracerBuilder zBuilder = builder.unwrap(ZipkinTracerBuilder.class);
 
         assertThat(zBuilder.serviceName(), is("helidon-service"));
         assertThat(zBuilder.protocol(), is("https"));
@@ -140,13 +165,13 @@ class ZipkinTracerBuilderTest {
 
     @Test
     void testActiveSpan() {
-        Tracer tracer = TracerBuilder.create("unit-test-active-span")
+        io.helidon.tracing.Tracer tracer = TracerBuilder.create("unit-test-active-span")
                 .collectorPort(49087)
                 .build();
-        Span span = tracer.buildSpan("unit-operation")
+        Span span = tracer.spanBuilder("unit-operation")
                 .start();
-        tracer.activateSpan(span);
+        span.activate();
 
-        span.finish();
+        span.end();
     }
 }

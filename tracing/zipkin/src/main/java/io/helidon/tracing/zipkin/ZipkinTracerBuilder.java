@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import io.helidon.config.Config;
+import io.helidon.config.metadata.Configured;
+import io.helidon.config.metadata.ConfiguredOption;
 import io.helidon.tracing.Tag;
 import io.helidon.tracing.TracerBuilder;
+import io.helidon.tracing.opentracing.OpenTracingTracerBuilder;
 
 import brave.Tracing;
 import brave.opentracing.BraveTracer;
@@ -105,7 +108,8 @@ import zipkin2.reporter.urlconnection.URLConnectionSender;
  * @see <a href="http://zipkin.io/pages/instrumenting.html#core-data-structures">Zipkin Attributes</a>
  * @see <a href="https://github.com/openzipkin/zipkin/issues/962">Zipkin Missing Service Name</a>
  */
-public class ZipkinTracerBuilder implements TracerBuilder<ZipkinTracerBuilder> {
+@Configured(prefix = "tracing", root = true, description = "Zipkin tracer configuration")
+public class ZipkinTracerBuilder implements OpenTracingTracerBuilder<ZipkinTracerBuilder> {
     static final Logger LOGGER = Logger.getLogger(ZipkinTracerBuilder.class.getName());
     static final String DEFAULT_PROTOCOL = "http";
     static final int DEFAULT_ZIPKIN_PORT = 9411;
@@ -154,7 +158,7 @@ public class ZipkinTracerBuilder implements TracerBuilder<ZipkinTracerBuilder> {
         return create().config(config);
     }
 
-    static TracerBuilder<ZipkinTracerBuilder> create() {
+    static ZipkinTracerBuilder create() {
         return new ZipkinTracerBuilder();
     }
 
@@ -166,7 +170,7 @@ public class ZipkinTracerBuilder implements TracerBuilder<ZipkinTracerBuilder> {
 
     @Override
     public ZipkinTracerBuilder collectorUri(URI uri) {
-        TracerBuilder.super.collectorUri(uri);
+        OpenTracingTracerBuilder.super.collectorUri(uri);
 
         if (null != uri.getUserInfo()) {
             this.userInfo = uri.getUserInfo();
@@ -236,6 +240,19 @@ public class ZipkinTracerBuilder implements TracerBuilder<ZipkinTracerBuilder> {
     public ZipkinTracerBuilder registerGlobal(boolean global) {
         this.global = global;
         return this;
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
+
+    @Override
+    public <B> B unwrap(Class<B> builderClass) {
+        if (ZipkinTracerBuilder.class == builderClass) {
+            return builderClass.cast(this);
+        }
+        throw new IllegalArgumentException("This is ZipkinTracerBuilder, not " + builderClass.getName());
     }
 
     @Override
@@ -328,6 +345,7 @@ public class ZipkinTracerBuilder implements TracerBuilder<ZipkinTracerBuilder> {
      * @param version version to use
      * @return updated builder instance
      */
+    @ConfiguredOption(value = "V2", key = "api-version")
     public ZipkinTracerBuilder version(Version version) {
         this.version = version;
         return this;

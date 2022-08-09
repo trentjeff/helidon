@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.helidon.config.Config;
+import io.helidon.config.metadata.Configured;
+import io.helidon.config.metadata.ConfiguredOption;
 import io.helidon.security.AuthenticationResponse;
 import io.helidon.security.EndpointConfig;
 import io.helidon.security.OutboundSecurityResponse;
@@ -47,8 +49,12 @@ import io.helidon.security.providers.common.OutboundConfig;
 import io.helidon.security.providers.common.TokenCredential;
 import io.helidon.security.spi.AuthenticationProvider;
 import io.helidon.security.spi.OutboundSecurityProvider;
+import io.helidon.security.spi.SecurityProvider;
 import io.helidon.security.spi.SynchronousProvider;
 import io.helidon.security.util.TokenHandler;
+import io.helidon.tracing.Span;
+import io.helidon.tracing.SpanContext;
+import io.helidon.tracing.Tracer;
 
 import com.google.api.client.googleapis.GoogleUtils;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -56,9 +62,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
 
 /**
  * Provider supporting login button from front-end.
@@ -228,22 +231,24 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
                                                 GoogleIdToken token,
                                                 Tracer tracer,
                                                 SpanContext tracingSpan) throws SecurityException {
-        Span span = tracer.buildSpan("googleTokenVerification")
-                .asChildOf(tracingSpan)
+        Span span = tracer.spanBuilder("googleTokenVerification")
+                .parent(tracingSpan)
                 .start();
 
         try {
+            Optional<CachedRecord> result;
 
             if (verifier.verify(token)) {
-                return Optional.of(new CachedRecord(buildSubject(accessToken, token.getPayload()),
+                result = Optional.of(new CachedRecord(buildSubject(accessToken, token.getPayload()),
                                                     () -> !verifyLocal(token.getPayload())));
             } else {
-                return Optional.empty();
+                result = Optional.empty();
             }
+            span.end();
+            return result;
         } catch (GeneralSecurityException | IOException e) {
+            span.end(e);
             throw new SecurityException("Failed to verify Google token", e);
-        } finally {
-            span.finish();
         }
     }
 
@@ -407,7 +412,13 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
     /**
      * Fluent API builder to build {@link GoogleTokenProvider} instance.
      */
+    @Configured(prefix = GoogleTokenService.CONFIG_PROVIDER_KEY,
+                description = "Google Authentication provider",
+                provides = {SecurityProvider.class, AuthenticationProvider.class})
     public static final class Builder implements io.helidon.common.Builder<Builder, GoogleTokenProvider> {
+
+        private static final String DEFAULT_REALM_VALUE = "helidon";
+
         private String clientId;
 
         private String proxyHost;
@@ -416,7 +427,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
                 .tokenHeader("Authorization")
                 .tokenPrefix("bearer ")
                 .build();
-        private String realm = "helidon";
+        private String realm = DEFAULT_REALM_VALUE;
         private GoogleIdTokenVerifier verifier;
         private BiFunction<JsonFactory, String, GoogleIdToken> tokenParser;
         private boolean optional;
@@ -449,6 +460,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param clientId client id as obtained from Google developer console
          * @return updated builder instance
          */
+        @ConfiguredOption
         public Builder clientId(String clientId) {
             Objects.requireNonNull(clientId);
 
@@ -463,6 +475,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param optional whether to be optional or not
          * @return updated builder instance
          */
+        @ConfiguredOption("false")
         public Builder optional(boolean optional) {
             this.optional = optional;
             return this;
@@ -475,6 +488,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param provider token provider
          * @return updated builder instance
          */
+        @ConfiguredOption(key = "token", value = "`Authorization` header with `bearer` prefix")
         public Builder tokenProvider(TokenHandler provider) {
             this.tokenHandler = provider;
             return this;
@@ -486,6 +500,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param realm realm of authentication
          * @return updated builder instance
          */
+        @ConfiguredOption(DEFAULT_REALM_VALUE)
         public Builder realm(String realm) {
             this.realm = realm;
             return this;
@@ -497,6 +512,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param host host of http proxy server
          * @return updated builder instance
          */
+        @ConfiguredOption
         public Builder proxyHost(String host) {
             if ((null == host) || host.isEmpty()) {
                 this.proxyHost = null;
@@ -512,6 +528,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param port port of http proxy server, defaults to 80
          * @return updated builder instance
          */
+        @ConfiguredOption("80")
         public Builder proxyPort(int port) {
             this.proxyPort = port;
             return this;
@@ -543,6 +560,7 @@ public final class GoogleTokenProvider extends SynchronousProvider implements Au
          * @param outboundConfig configuration of outbound
          * @return updated builder instance
          */
+        @ConfiguredOption(key = "outbound")
         public Builder outboundConfig(OutboundConfig outboundConfig) {
             this.outboundConfig = outboundConfig;
             return this;
