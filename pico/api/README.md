@@ -1,0 +1,4 @@
+This module contains all the types that are generically applicable to any Pico-based application implementation. The API is consumer-facing and small since most of the supporting types actually come from the javax/jakarta inject and annotations modules. The SPI package supports the runtime implementation and is generally not of much interest to the majority of developers using DI. The only aspect of the SPI that needs to be used directly is the <i>PicoServices and Services</i> classes since these are used activate one or more of the startup services that comprise your application.
+
+* The consumer-facing types are in [io.helidon.pico](src/main/java/io/helidon/pico)
+* The provider-facing types are in [io.helidon.pico.spi](src/main/java/io/helidon/pico/spi) - and see in particular the API for the [Services Registry](src/main/java/io/helidon/pico/spi/Services.java) to lookup (and activate) services programmatically.

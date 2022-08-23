@@ -238,7 +238,7 @@ import io.helidon.config.spi.OverrideSource;
  * config system merges these together so that values from config sources with higher priority have
  * precedence over values from config sources with lower priority.
  */
-public interface Config {
+public interface Config extends io.helidon.pico.config.Config {
     /**
      * Generic type of configuration.
      */
@@ -446,6 +446,7 @@ public interface Config {
      * @return current config node key
      * @see #name()
      */
+    @Override
     Key key();
 
     /**
@@ -478,6 +479,7 @@ public interface Config {
      * @see #key()
      * @see Key#name()
      */
+    @Override
     default String name() {
         return key().name();
     }
@@ -491,6 +493,7 @@ public interface Config {
      * @return config node for specified sub-key, never returns {@code null}.
      * @see #get(Key)
      */
+    @Override
     default Config get(String key) {
         Objects.requireNonNull(key, "Key argument is null.");
 
@@ -546,6 +549,7 @@ public interface Config {
      *
      * @return returns detached Config instance of same config node
      */
+    @Override
     Config detach();
 
     /**
@@ -553,6 +557,7 @@ public interface Config {
      *
      * @return the {@code Type} of the configuration node
      */
+    @Override
     Type type();
 
     /**
@@ -561,6 +566,7 @@ public interface Config {
      *
      * @return {@code true} if the node exists
      */
+    @Override
     default boolean exists() {
         return type().exists();
     }
@@ -574,6 +580,7 @@ public interface Config {
      * @return {@code true} if the node is existing leaf node, {@code false}
      *         otherwise.
      */
+    @Override
     default boolean isLeaf() {
         return type().isLeaf();
     }
@@ -698,6 +705,7 @@ public interface Config {
      * @see ConfigValue#get()
      * @see ConfigValue#orElse(Object)
      */
+    @Override
     <T> ConfigValue<T> as(Class<T> type);
 
     /**
@@ -766,6 +774,7 @@ public interface Config {
      * @return a typed list with values
      * @throws ConfigMappingException in case of problem to map property value.
      */
+    @Override
     <T> ConfigValue<List<T>> asList(Class<T> type) throws ConfigMappingException;
 
     /**
@@ -833,6 +842,7 @@ public interface Config {
      * @see #traverse()
      * @see #detach()
      */
+    @Override
     ConfigValue<Map<String, String>> asMap() throws MissingValueException;
 
     //
@@ -882,7 +892,7 @@ public interface Config {
      *
      * @see Config#key()
      */
-    interface Key extends Comparable<Key> {
+    interface Key extends io.helidon.pico.config.Config.Key {
         /**
          * Returns instance of Key that represents key of parent config node.
          * <p>
@@ -893,39 +903,6 @@ public interface Config {
          * @throws java.lang.IllegalStateException in case you attempt to call this method on a root node
          */
         Key parent();
-
-        /**
-         * Returns {@code true} in case the key represents root config node,
-         * otherwise it returns {@code false}.
-         *
-         * @return {@code true} in case the key represents root node, otherwise {@code false}.
-         * @see #parent()
-         */
-        boolean isRoot();
-
-        /**
-         * Returns the name of Config node.
-         * <p>
-         * The name of a node is the last token in fully-qualified key.
-         * Depending on context the name is evaluated one by one:
-         * <ul>
-         * <li>in {@link Type#OBJECT} node the name represents a <strong>name of object member</strong>;</li>
-         * <li>in {@link Type#LIST} node the name represents an zero-based <strong>index of list element</strong>,
-         * an unsigned base-10 integer value, leading zeros are not allowed.</li>
-         * </ul>
-         *
-         * @return name of config node
-         * @see Config#name()
-         */
-        String name();
-
-        /**
-         * Returns formatted fully-qualified key.
-         *
-         * @return formatted fully-qualified key.
-         */
-        @Override
-        String toString();
 
         /**
          * Create a child key to the current key.
@@ -981,64 +958,6 @@ public interface Config {
         static String unescapeName(String escapedName) {
             return escapedName.replaceAll("~1", ".")
                     .replaceAll("~0", "~");
-        }
-    }
-
-    //
-    // enum node Type
-    //
-
-    /**
-     * Configuration node types.
-     */
-    enum Type {
-        /**
-         * Config node is an object of named members
-         * ({@link #VALUE values}, {@link #LIST lists} or other objects).
-         */
-        OBJECT(true, false),
-        /**
-         * Config node is a list of indexed elements
-         * ({@link #VALUE values}, {@link #OBJECT objects} or other lists).
-         */
-        LIST(true, false),
-        /**
-         * Config node is a leaf {@code String}-based single value,
-         * member of {@link #OBJECT object} or {@link #LIST list} element.
-         */
-        VALUE(true, true),
-        /**
-         * Config node does not exists.
-         */
-        MISSING(false, false);
-
-        private final boolean exists;
-        private final boolean isLeaf;
-
-        Type(boolean exists, boolean isLeaf) {
-            this.exists = exists;
-            this.isLeaf = isLeaf;
-        }
-
-        /**
-         * Returns {@code true} if the node exists, either as an object, a list or as a value node.
-         *
-         * @return {@code true} if the node exists
-         */
-        public boolean exists() {
-            return exists;
-        }
-
-        /**
-         * Returns {@code true} if this configuration node is existing a value node.
-         * <p>
-         * Leaf configuration node does not contain any nested configuration sub-trees,
-         * but only a single associated value.
-         *
-         * @return {@code true} if the node is existing leaf node, {@code false} otherwise.
-         */
-        public boolean isLeaf() {
-            return isLeaf;
         }
     }
 

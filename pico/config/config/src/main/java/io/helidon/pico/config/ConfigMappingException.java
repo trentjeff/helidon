@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2017, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.helidon.config;
+package io.helidon.pico.config;
 
 import java.lang.reflect.Type;
 
@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
  * Thrown when there is an error mapping a {@code String} configuration
  * value to a specific Java type.
  */
-public class ConfigMappingException extends io.helidon.pico.config.ConfigMappingException {
+public class ConfigMappingException extends ConfigException {
 
     private static final long serialVersionUID = -5964426441508571154L;
 
@@ -35,7 +35,7 @@ public class ConfigMappingException extends io.helidon.pico.config.ConfigMapping
      * @param detail detailed information of mapping failure.
      */
     public ConfigMappingException(Config.Key key, String detail) {
-        super(key, detail);
+        super("Mapping of value stored under key '" + key + "' has failed: " + detail);
     }
 
     /**
@@ -46,7 +46,8 @@ public class ConfigMappingException extends io.helidon.pico.config.ConfigMapping
      * @param cause  root exception cause.
      */
     public ConfigMappingException(Config.Key key, String detail, Throwable cause) {
-        super(key, detail, cause);
+        super("Mapping of value stored under key '" + key + "' has failed: " + detail,
+              cause);
     }
 
     /**
@@ -69,7 +70,8 @@ public class ConfigMappingException extends io.helidon.pico.config.ConfigMapping
      * @param cause  root exception cause.
      */
     public ConfigMappingException(Config.Key key, Type type, String detail, Throwable cause) {
-        super(key, type, detail, cause);
+        super("Mapping of value stored under key '" + key + "' to type '" + type.getTypeName() + "' has failed: " + detail,
+              cause);
     }
 
     /**
@@ -81,7 +83,8 @@ public class ConfigMappingException extends io.helidon.pico.config.ConfigMapping
      * @param cause root exception cause.
      */
     public ConfigMappingException(Config.Key key, String value, Class<?> type, Throwable cause) {
-        super(key, value, type, cause);
+        super("Mapping of value '" + value + "' stored under key '" + key + "' to type '" + type.getName() + "' has failed.",
+              cause);
     }
 
     /**
@@ -93,6 +96,8 @@ public class ConfigMappingException extends io.helidon.pico.config.ConfigMapping
      * @param cause  root exception cause.
      */
     public ConfigMappingException(Config.Key key, String value, String detail, Throwable cause) {
-        super(key, value, detail, cause);
+        super("Mapping of value '" + value + "' stored under key '" + key + "' has failed: " + detail,
+              cause);
     }
+
 }

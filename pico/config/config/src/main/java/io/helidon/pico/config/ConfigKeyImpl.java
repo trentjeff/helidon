@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Oracle and/or its affiliates.
+ * Copyright (c) 2020, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.helidon.config;
+package io.helidon.pico.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,13 +26,17 @@ import java.util.Objects;
 /**
  * Implementation of {@link Config.Key Config Key}.
  */
-class ConfigKeyImpl implements Config.Key {
+/*public*/ class ConfigKeyImpl implements Config.Key {
     private final String name;
     private final ConfigKeyImpl parent;
     private final List<String> path;
     private final String fullKey;
 
-    private ConfigKeyImpl(ConfigKeyImpl parent, String name) {
+    protected ConfigKeyImpl() {
+        this(null, "");
+    }
+
+    protected ConfigKeyImpl(ConfigKeyImpl parent, String name) {
         Objects.requireNonNull(name, "name is mandatory");
 
         if (name.contains(".")) {
@@ -58,6 +62,30 @@ class ConfigKeyImpl implements Config.Key {
         this.fullKey = fullSB.toString();
     }
 
+    /**
+     * Creates new root instance of ConfigKeyImpl.
+     *
+     * @return new instance of ConfigKeyImpl.
+     */
+    static ConfigKeyImpl of() {
+        return new ConfigKeyImpl();
+    }
+
+    /**
+     * Creates new instance of ConfigKeyImpl.
+     *
+     * @param key key
+     * @return new instance of ConfigKeyImpl.
+     */
+    public static ConfigKeyImpl of(String key) {
+        return of().child(key);
+    }
+//
+//    @Override
+//    public Config.Key create(String key) {
+//        return of(key);
+//    }
+//
     @Override
     public ConfigKeyImpl parent() {
         if (isRoot()) {
@@ -71,33 +99,9 @@ class ConfigKeyImpl implements Config.Key {
         return (null == parent);
     }
 
-    /**
-     * Creates new root instance of ConfigKeyImpl.
-     *
-     * @return new instance of ConfigKeyImpl.
-     */
-    static ConfigKeyImpl of() {
-        return new ConfigKeyImpl(null, "");
-    }
-
-    /**
-     * Creates new instance of ConfigKeyImpl.
-     *
-     * @param key key
-     * @return new instance of ConfigKeyImpl.
-     */
-    static ConfigKeyImpl of(String key) {
-        return of().child(key);
-    }
-
-    /**
-     * Creates new child instance of ConfigKeyImpl.
-     *
-     * @param key sub-key
-     * @return new child instance of ConfigKeyImpl.
-     */
-    ConfigKeyImpl child(String key) {
-        return child(Arrays.asList(key.split("\\.")));
+    @Override
+    public String name() {
+        return name;
     }
 
     /**
@@ -121,6 +125,44 @@ class ConfigKeyImpl implements Config.Key {
         return child(path);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, parent);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ConfigKeyImpl key = (ConfigKeyImpl) o;
+        return Objects.equals(name, key.name)
+                && Objects.equals(parent, key.parent);
+    }
+
+    @Override
+    public String toString() {
+        return fullKey;
+    }
+
+    @Override
+    public int compareTo(Config.Key that) {
+        return toString().compareTo(that.toString());
+    }
+
+    /**
+     * Creates new child instance of ConfigKeyImpl.
+     *
+     * @param key sub-key
+     * @return new child instance of ConfigKeyImpl.
+     */
+    ConfigKeyImpl child(String key) {
+        return child(Arrays.asList(key.split("\\.")));
+    }
+
     private ConfigKeyImpl child(List<String> path) {
         ConfigKeyImpl result = this;
         for (String name : path) {
@@ -130,39 +172,6 @@ class ConfigKeyImpl implements Config.Key {
             result = new ConfigKeyImpl(result, name);
         }
         return result;
-    }
-
-    @Override
-    public String name() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return fullKey;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof io.helidon.pico.config.Config.Key)) {
-            return false;
-        }
-        io.helidon.pico.config.Config.Key key = (io.helidon.pico.config.Config.Key) o;
-        return Objects.equals(name(), key.name())
-                && Objects.equals(parent(), key.parent());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name(), parent());
-    }
-
-    @Override
-    public int compareTo(io.helidon.pico.config.Config.Key that) {
-        return toString().compareTo(that.toString());
     }
 
 }

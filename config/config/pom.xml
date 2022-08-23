@@ -43,6 +43,10 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.helidon.pico.config</groupId>
+            <artifactId>helidon-pico-config</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.helidon.common</groupId>
             <artifactId>helidon-common</artifactId>
         </dependency>

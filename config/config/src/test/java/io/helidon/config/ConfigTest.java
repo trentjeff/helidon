@@ -35,9 +35,7 @@ import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static io.helidon.config.Config.Type.LIST;
-import static io.helidon.config.Config.Type.OBJECT;
-import static io.helidon.config.Config.Type.VALUE;
+import static io.helidon.pico.config.Config.Type.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;

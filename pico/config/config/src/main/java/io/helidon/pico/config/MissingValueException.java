@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2017, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.helidon.config;
+package io.helidon.pico.config;
 
 import java.util.function.Supplier;
 
 /**
  * Exception representing a specific failures related to a missing configuration value.
  */
-public class MissingValueException extends io.helidon.pico.config.MissingValueException {
+public class MissingValueException extends ConfigException {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public class MissingValueException extends io.helidon.pico.config.MissingValueEx
      * @param key configuration key associated with the expected value.
      */
     protected MissingValueException(Config.Key key) {
-        super(key);
+        super("Requested value for configuration key '" + key + "' is not present in the configuration.");
     }
 
     /**
@@ -53,4 +53,5 @@ public class MissingValueException extends io.helidon.pico.config.MissingValueEx
     public static Supplier<MissingValueException> createSupplier(Config.Key key) {
         return () -> new MissingValueException(key);
     }
+
 }

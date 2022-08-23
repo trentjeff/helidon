@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static io.helidon.config.Config.Type.OBJECT;
+import static io.helidon.pico.config.Config.Type.OBJECT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.endsWith;

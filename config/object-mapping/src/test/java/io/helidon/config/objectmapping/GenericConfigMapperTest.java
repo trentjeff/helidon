@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import io.helidon.config.Config;
-import io.helidon.config.Config.Type;
+import io.helidon.pico.config.Config.Type;
 import io.helidon.config.ConfigMappingException;
 import io.helidon.config.ConfigSources;
 import io.helidon.config.spi.ConfigNode.ListNode;
