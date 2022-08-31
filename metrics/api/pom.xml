@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.helidon.metrics</groupId>
         <artifactId>helidon-metrics-project</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -48,6 +48,8 @@
         <dependency>
             <groupId>io.helidon.config</groupId>
             <artifactId>helidon-config-metadata</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.metrics</groupId>

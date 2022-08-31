@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2022 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
 
 import io.helidon.common.Prioritized;
 import io.helidon.common.configurable.ServerThreadPoolSupplier;
+import io.helidon.common.context.Context;
+import io.helidon.common.context.Contexts;
 import io.helidon.common.http.Http;
 import io.helidon.config.Config;
 import io.helidon.microprofile.cdi.BuildTimeStart;
@@ -255,8 +257,16 @@ public class ServerCdiExtension implements Extension {
                         .forEach(s -> shared.register(Bindings.service(s)));
             }
 
-            // Add all applications
-            jaxRsApplications.forEach(it -> addApplication(jaxRs, it, shared));
+            // Add all applications making the Application subclass (if accessible via
+            // CDI) available in our context to be used by JAX-RS features
+            jaxRsApplications.forEach(it -> it.applicationClass()
+                    .flatMap(appClass -> CDI.current().select(appClass).stream().findFirst())
+                    .ifPresentOrElse(app -> {
+                        Context parent = Contexts.context().orElse(null);
+                        Context startupContext = Context.create(parent);
+                        startupContext.register(app);
+                        Contexts.runInContext(startupContext, () -> addApplication(jaxRs, it, shared));
+                    }, () -> addApplication(jaxRs, it, shared)));
         }
         STARTUP_LOGGER.finest("Registered jersey application(s)");
     }
@@ -288,9 +298,10 @@ public class ServerCdiExtension implements Extension {
         StaticContentSupport.FileSystemBuilder pBuilder = StaticContentSupport.builder(config.get("location")
                                                                                                .as(Path.class)
                                                                                                .get());
-        config.get("welcome")
+        pBuilder.welcomeFileName(config.get("welcome")
                 .asString()
-                .ifPresent(pBuilder::welcomeFileName);
+                .orElse("index.html"));
+
         StaticContentSupport staticContent = pBuilder.build();
 
         if (context.exists()) {
