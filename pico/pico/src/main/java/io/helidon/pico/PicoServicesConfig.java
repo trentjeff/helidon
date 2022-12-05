@@ -23,7 +23,6 @@ import io.helidon.common.config.Config;
 /**
  * Provides optional config by the provider implementation.
  */
-@Contract
 public interface PicoServicesConfig extends Config {
 
     /**
@@ -32,7 +31,7 @@ public interface PicoServicesConfig extends Config {
     String NAME = "pico";
 
     /**
-     * The fully qualified name for pico (used for system properties, etc).
+     * The fully qualified name for pico.
      */
     String FQN = "io.helidon." + NAME;
 
@@ -62,6 +61,15 @@ public interface PicoServicesConfig extends Config {
      * The default value for this is false, meaning that the activation logs will not be recorded or logged.
      */
     boolean DEFAULT_ACTIVATION_LOGS_ENABLED = false;
+
+    /**
+     * Applicable for capturing activation logs.
+     */
+    String KEY_SERVICE_LOOKUP_CACHING_ENABLED = FQN + ".services.caching.enabled";
+    /**
+     * The default value for this is false, meaning that not caching will occur.
+     */
+    boolean DEFAULT_SERVICE_LOOKUP_CACHING_ENABLED = false;
 
     /**
      * The key that models the services registry, and whether the registry can expand dynamically after program startup.
@@ -156,13 +164,65 @@ public interface PicoServicesConfig extends Config {
     }
 
     /**
-     * Shortcut method to obtain a String with a default value supplier.
+     * Shortcut method to obtain a String using a key. The config key must be valid in that it has a value, or default
+     * value assigned.
      *
      * @param key configuration key
-     * @param defaultValue default value
+     * @return value
+     * @throws java.lang.IllegalStateException if the key is not present or has no default value from configuration
+     */
+    default String asString(String key) {
+        return get(key).asString().orElseThrow(IllegalStateException::new);
+    }
+
+    /**
+     * Shortcut method to obtain a Boolean with a default value supplier.
+     *
+     * @param key configuration key
+     * @param defaultValueSupplier supplier of default value
      * @return value
      */
-    default String asString(String key, String defaultValue) {
-        return get(key).asString().orElse(defaultValue);
+    default Boolean asBoolean(String key,
+                              Supplier<Boolean> defaultValueSupplier) {
+        return get(key).asBoolean().orElseGet(defaultValueSupplier);
     }
+
+    /**
+     /**
+     * Shortcut method to obtain a String using a key. The config key must be valid in that it has a value, or default
+     * value assigned.
+     *
+     * @param key configuration key
+     * @return value
+     * @throws java.lang.IllegalStateException if the key is not present or has no default value from configuration
+     */
+    default Boolean asBoolean(String key) {
+        return get(key).asBoolean().orElseThrow(IllegalStateException::new);
+    }
+
+    /**
+     * Shortcut method to obtain a Long with a default value supplier.
+     *
+     * @param key configuration key
+     * @param defaultValueSupplier supplier of default value
+     * @return value
+     */
+    default Long asLong(String key,
+                        Supplier<Long> defaultValueSupplier) {
+        return get(key).asLong().orElseGet(defaultValueSupplier);
+    }
+
+    /**
+     /**
+     * Shortcut method to obtain a Long using a key. The config key must be valid in that it has a value, or default
+     * value assigned.
+     *
+     * @param key configuration key
+     * @return value
+     * @throws java.lang.IllegalStateException if the key is not present or has no default value from configuration
+     */
+    default Long asLong(String key) {
+        return get(key).asLong().orElseThrow(IllegalStateException::new);
+    }
+
 }

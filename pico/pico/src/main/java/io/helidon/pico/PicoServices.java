@@ -24,6 +24,7 @@ import java.util.Optional;
  * An implementation of this interface must minimally supply a "services registry" - see {@link #services()}.
  */
 public interface PicoServices {
+
     /**
      * Empty criteria will match anything and everything.
      */
@@ -103,7 +104,7 @@ public interface PicoServices {
      *
      * @return a map of all managed service types deactivated to results of deactivation
      */
-    default Optional<Map<String, ActivationResult<?>>> shutdown() {
+    default Optional<Map<String, ActivationResult>> shutdown() {
         return Optional.empty();
     }
 

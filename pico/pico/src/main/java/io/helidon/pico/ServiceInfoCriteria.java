@@ -24,9 +24,12 @@ import io.helidon.builder.Singular;
 
 /**
  * A criteria to discover service.
+ *
+ * @see ServiceInfo
  */
 @Builder
 public interface ServiceInfoCriteria {
+
     /**
      * The managed service implementation {@link Class}.
      *
@@ -97,4 +100,5 @@ public interface ServiceInfoCriteria {
      * @return the module name
      */
     Optional<String> moduleName();
+
 }

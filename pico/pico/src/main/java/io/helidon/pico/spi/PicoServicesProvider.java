@@ -16,6 +16,8 @@
 
 package io.helidon.pico.spi;
 
+import java.util.Optional;
+
 import io.helidon.pico.PicoServices;
 
 /**
@@ -29,4 +31,14 @@ public interface PicoServicesProvider {
      * @return Pico services
      */
     PicoServices services();
+
+    /**
+     * Provide any extended SPI services implementation.
+     *
+     * @return extended Pico services
+     */
+    default Optional<ExtendedServices> extendedServices() {
+        return Optional.empty();
+    }
+
 }

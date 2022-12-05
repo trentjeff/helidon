@@ -27,18 +27,16 @@ import io.helidon.builder.Builder;
  *
  * @see Activator
  * @see DeActivator
- *
- * @param <T> The type of the associated activator
  */
 @Builder
-public interface ActivationResult<T> {
+public interface ActivationResult {
 
     /**
      * The service provider undergoing activation or deactivation.
      *
      * @return the service provider generating the result
      */
-    ServiceProvider<T> serviceProvider();
+    ServiceProvider<?> serviceProvider();
 
     /**
      * Optionally, given by the implementation provider to indicate the future completion when the provider's
@@ -46,7 +44,7 @@ public interface ActivationResult<T> {
      *
      * @return the future result, assuming how activation can be async in nature
      */
-    Optional<Future<ActivationResult<T>>> finishedActivationResult();
+    Optional<Future<ActivationResult>> finishedActivationResult();
 
     /**
      * The activation phase that was found at onset of the phase transition.
@@ -117,7 +115,7 @@ public interface ActivationResult<T> {
      * @return true if finished
      */
     default boolean finished() {
-        Future<ActivationResult<T>> f = finishedActivationResult().orElse(null);
+        Future<ActivationResult> f = finishedActivationResult().orElse(null);
         return (Objects.isNull(f) || f.isDone());
     }
 
@@ -128,6 +126,15 @@ public interface ActivationResult<T> {
      */
     default boolean success() {
         return finishingStatus() != ActivationStatus.FAILURE;
+    }
+
+    /**
+     * Creates a simple success result.
+     *
+     * @return a simple success result
+     */
+    static ActivationResult createSuccess() {
+        return DefaultActivationResult.builder().finishingStatus(ActivationStatus.SUCCESS).build();
     }
 
 }

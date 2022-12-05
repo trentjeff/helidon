@@ -16,6 +16,7 @@
 
 package io.helidon.pico;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -105,6 +106,23 @@ public interface ElementInfo {
      * @return the target receiver name
      */
     String elementName();
+
+    // TODO:
+//    /**
+//     * If the element kind is a constructor, then force the name to be #CONSTRUCTOR
+//     */
+//    default String normalizedElementName() {
+//            if (Objects.isNull(elementName)) {
+//                ElementKind kind = Objects.requireNonNull(getElementKind());
+//                if (ElementKind.CTOR == kind) {
+//                    elementName = InjectionPointInfo.CTOR;
+//                } else {
+//                    throw new NullPointerException("elementName");
+//                }
+//            }
+//
+//            return Objects.requireNonNull(elementName);
+//    }
 
     /**
      * If the element is a method or constructor then this is the ordinal argument position of that argument.

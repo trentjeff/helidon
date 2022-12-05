@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Service loader test for Pico.
  */
-class ServiceLoaderTest {
+class PicoServicesTest {
 
     /**
      * Test basic loader.

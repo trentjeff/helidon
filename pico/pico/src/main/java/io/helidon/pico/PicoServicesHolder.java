@@ -24,7 +24,7 @@ import io.helidon.common.LazyValue;
 import io.helidon.pico.spi.PicoServicesProvider;
 
 /**
- * The holder for the active {@link PicoServices} instance.
+ * The holder for the active {@link PicoServices} global singleton instance.
  */
 class PicoServicesHolder {
     private static final LazyValue<Optional<PicoServices>> INSTANCE = LazyValue.create(PicoServicesHolder::load);
@@ -32,12 +32,18 @@ class PicoServicesHolder {
     private PicoServicesHolder() {
     }
 
+    /**
+     * Provides access to the active {@link PicoServices} global singleton instance.
+     *
+     * @return the global singleton instance
+     */
     static Optional<PicoServices> picoServices() {
         return INSTANCE.get();
     }
 
     private static Optional<PicoServices> load() {
-        return HelidonServiceLoader.create(ServiceLoader.load(PicoServicesProvider.class))
+        return HelidonServiceLoader.create(ServiceLoader.load(PicoServicesProvider.class,
+                                                              PicoServicesProvider.class.getClassLoader()))
                 .asList()
                 .stream()
                 .findFirst()
