@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static io.helidon.config.testing.MatcherWithRetry.assertThatWithRetry;
 import static io.helidon.microprofile.metrics.HelloWorldResource.MESSAGE_SIMPLE_TIMER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -112,9 +113,9 @@ public class HelloWorldTest {
         assertThat("Value of explicitly-updated counter", registry.counter("helloCounter").getCount(),
                 is((long) iterations));
 
-        assertThat("Diff in value of interceptor-updated class-level counter for constructor",
-                   classLevelCounterForConstructor.getCount() - classLevelCounterStart,
-                is((long) iterations));
+        assertThatWithRetry("Diff in value of interceptor-updated class-level counter for constructor",
+                            () -> classLevelCounterForConstructor.getCount() - classLevelCounterStart,
+                            is((long) iterations));
 
         Counter classLevelCounterForMethod =
                 registry.getCounters().get(new MetricID(HelloWorldResource.class.getName() + ".message"));
@@ -124,13 +125,13 @@ public class HelloWorldTest {
 
         SimpleTimer simpleTimer = getSyntheticSimpleTimer("message");
         assertThat("Synthetic simple timer", simpleTimer, is(notNullValue()));
-        assertThat("Synthetic simple timer count value", simpleTimer.getCount(), is((long) iterations));
+        assertThatWithRetry("Synthetic simple timer count value", simpleTimer::getCount, is((long) iterations));
 
         checkMetricsUrl(iterations);
     }
 
     @Test
-    public void testSyntheticSimpleTimer() {
+    public void testSyntheticSimpleTimer() throws InterruptedException {
         testSyntheticSimpleTimer(1L);
     }
 
@@ -151,7 +152,9 @@ public class HelloWorldTest {
         );
 
         assertThat("Response code from mapped exception endpoint", response.getStatus(), is(500));
-        assertThat("Change in successful count", simpleTimer.getCount() - successfulBeforeRequest, is(1L));
+        assertThatWithRetry("Change in successful count",
+                            () -> simpleTimer.getCount() - successfulBeforeRequest,
+                            is(1L));
         assertThat("Change in unsuccessful count", counter.getCount() - unsuccessfulBeforeRequest, is(0L));
     }
 
@@ -172,11 +175,17 @@ public class HelloWorldTest {
         );
 
         assertThat("Response code from unmapped exception endpoint", response.getStatus(), is(500));
-        assertThat("Change in successful count", simpleTimer.getCount() - successfulBeforeRequest, is(0L));
+        assertThatWithRetry("Change in successful count",
+                            () -> simpleTimer.getCount() - successfulBeforeRequest,
+                            is(0L));
         assertThat("Change in unsuccessful count", counter.getCount() - unsuccessfulBeforeRequest, is(1L));
     }
 
     void testSyntheticSimpleTimer(long expectedSyntheticSimpleTimerCount) {
+        SimpleTimer explicitSimpleTimer = registry.getSimpleTimer(new MetricID(MESSAGE_SIMPLE_TIMER));
+        assertThat("SimpleTimer from explicit @SimplyTimed", explicitSimpleTimer, is(notNullValue()));
+        SimpleTimer syntheticSimpleTimer = getSyntheticSimpleTimer("messageWithArg", String.class);
+        assertThat("SimpleTimer from @SyntheticRestRequest", syntheticSimpleTimer, is(notNullValue()));
         IntStream.range(0, (int) expectedSyntheticSimpleTimerCount).forEach(
                 i -> webTarget
                         .path("helloworld/withArg/Joe")
@@ -184,14 +193,13 @@ public class HelloWorldTest {
                         .get(String.class));
 
         pause();
-        SimpleTimer explicitSimpleTimer = registry.simpleTimer(MESSAGE_SIMPLE_TIMER);
-        assertThat("SimpleTimer from explicit @SimplyTimed", explicitSimpleTimer, is(notNullValue()));
-        assertThat("SimpleTimer from explicit @SimpleTimed count", explicitSimpleTimer.getCount(),
-                is(expectedSyntheticSimpleTimerCount));
+        assertThatWithRetry("SimpleTimer from explicit @SimpleTimed count",
+                            explicitSimpleTimer::getCount,
+                            is(expectedSyntheticSimpleTimerCount));
 
-        SimpleTimer syntheticSimpleTimer = getSyntheticSimpleTimer("messageWithArg", String.class);
-        assertThat("SimpleTimer from @SyntheticRestRequest", syntheticSimpleTimer, is(notNullValue()));
-        assertThat("SimpleTimer from @SyntheticRestRequest count", syntheticSimpleTimer.getCount(), is(expectedSyntheticSimpleTimerCount));
+        assertThatWithRetry("SimpleTimer from @SyntheticRestRequest count",
+                            syntheticSimpleTimer::getCount,
+                            is(expectedSyntheticSimpleTimerCount));
     }
 
     SimpleTimer getSyntheticSimpleTimer(String methodName, Class<?>... paramTypes) {
@@ -213,12 +221,14 @@ public class HelloWorldTest {
     }
 
     void checkMetricsUrl(int iterations) {
-        JsonObject app = webTarget
-                .path("metrics")
-                .request()
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(JsonObject.class)
-                .getJsonObject("application");
-        assertThat(app.getJsonNumber("helloCounter").intValue(), is(iterations));
+        assertThatWithRetry("helloCounter count", () -> {
+            JsonObject app = webTarget
+                    .path("metrics")
+                    .request()
+                    .accept(MediaType.APPLICATION_JSON_TYPE)
+                    .get(JsonObject.class)
+                    .getJsonObject("application");
+            return app.getJsonNumber("helloCounter").intValue();
+        }, is(iterations));
     }
 }

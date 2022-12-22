@@ -45,7 +45,12 @@
                     <value key="artifactId">hamcrest-all</value>
                     <value key="scope">test</value>
                 </map>
-                <map order="0">
+                <map if="!(${extra} contains 'webclient')" order="0">
+                    <value key="groupId">io.helidon.webclient</value>
+                    <value key="artifactId">helidon-webclient</value>
+                    <value key="scope">test</value>
+                </map>
+                <map if="${extra} contains 'webclient'" order="0">
                     <value key="groupId">io.helidon.webclient</value>
                     <value key="artifactId">helidon-webclient</value>
                 </map>
@@ -59,6 +64,8 @@
             </list>
             <list key="MainTest-java-imports">
                 <value>java.util.concurrent.CompletableFuture</value>
+                <value>java.util.concurrent.ExecutionException</value>
+                <value>java.util.concurrent.TimeoutException</value>
                 <value>java.util.concurrent.TimeUnit</value>
             </list>
             <list key="MainTest-helidon-imports">
@@ -70,10 +77,7 @@
             <list key="MainTest-other-imports">
                 <value>org.junit.jupiter.api.AfterAll</value>
                 <value>org.junit.jupiter.api.BeforeAll</value>
-                <value>org.junit.jupiter.api.MethodOrderer</value>
-                <value>org.junit.jupiter.api.MethodOrderer.MethodName</value>
                 <value>org.junit.jupiter.api.Test</value>
-                <value>org.junit.jupiter.api.TestMethodOrder</value>
             </list>
             <list key="MainTest-static-imports">
                 <value>static org.hamcrest.MatcherAssert.assertThat</value>

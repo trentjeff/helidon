@@ -152,6 +152,11 @@ public final class MediaType implements AcceptPredicate<MediaType> {
      */
     public static final MediaType APPLICATION_X_NDJSON;
 
+    /**
+     * A {@link MediaType} constant representing the {@code application/openmetrics-text} media type.
+     */
+    public static final MediaType APPLICATION_OPENMETRICS;
+
     static {
         Map<String, MediaType> knownTypes = new HashMap<>();
 
@@ -220,6 +225,9 @@ public final class MediaType implements AcceptPredicate<MediaType> {
 
         APPLICATION_X_NDJSON = new MediaType("application", "x-ndjson");
         knownTypes.put("application/x-ndjson", APPLICATION_X_NDJSON);
+
+        APPLICATION_OPENMETRICS = new MediaType("application", "openmetrics-text");
+        knownTypes.put("application/openmetrics-text", APPLICATION_OPENMETRICS);
 
         KNOWN_TYPES = Collections.unmodifiableMap(knownTypes);
     }
@@ -464,6 +472,25 @@ public final class MediaType implements AcceptPredicate<MediaType> {
                 .subtype(this.subtype)
                 .charset(charset)
                 .parameters(this.parameters)
+                .build();
+    }
+
+    /**
+     * Create a new {@code MediaType} instance with the same type and subtype.
+     * All parameters are trimmed. If current {@code MediaType} instance does not contain
+     * parameters, the same instance is returned.
+     *
+     * @return {@code MediaType} instance without parameters.
+     * @deprecated will be removed in 4.x version.
+     */
+    @Deprecated(since = "2.5.5", forRemoval = true)
+    public MediaType withoutParameters() {
+        if (this.parameters.isEmpty()) {
+            return this;
+        }
+        return MediaType.builder()
+                .type(this.type)
+                .subtype(this.subtype)
                 .build();
     }
 
