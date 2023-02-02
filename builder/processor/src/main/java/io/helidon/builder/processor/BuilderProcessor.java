@@ -157,6 +157,11 @@ public class BuilderProcessor extends AbstractProcessor {
         AnnotationAndValue builderAnnotation = BuilderTypeTools
                 .createAnnotationAndValueFromMirror(am, elementUtils).get();
         TypeName typeName = BuilderTypeTools.createTypeNameFromElement(element).orElse(null);
+        if (!BuilderTypeTools.isAcceptableBuilderTarget(element)) {
+            String msg = annoType + " is not intended to be targeted to this type: " + element;
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg);
+            throw new IllegalStateException(msg);
+        }
         Optional<TypeInfo> typeInfo = tools
                 .createTypeInfo(builderAnnotation.typeName(), typeName, (TypeElement) element, processingEnv);
         if (typeInfo.isEmpty()) {
