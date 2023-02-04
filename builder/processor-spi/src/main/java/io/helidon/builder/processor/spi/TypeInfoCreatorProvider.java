@@ -21,7 +21,7 @@ import java.util.Optional;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
-import io.helidon.pico.types.TypeName;
+import io.helidon.builder.types.TypeName;
 
 /**
  * Java {@link java.util.ServiceLoader} provider interface used to discover type info creators.
@@ -39,9 +39,10 @@ public interface TypeInfoCreatorProvider {
      * @param processingEnv the processing environment
      * @return the type info associated with the arguments being processed, or empty if not able to process the type
      */
-    Optional<TypeInfo> createTypeInfo(TypeName annoTypeName,
-                                      TypeName typeName,
-                                      TypeElement element,
-                                      ProcessingEnvironment processingEnv);
+    Optional<TypeInfo> createTypeInfo(
+            TypeName annoTypeName,
+            TypeName typeName,
+            TypeElement element,
+            ProcessingEnvironment processingEnv);
 
 }
