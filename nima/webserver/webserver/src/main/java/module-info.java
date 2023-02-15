@@ -39,6 +39,8 @@ module io.helidon.nima.webserver {
     requires io.helidon.logging.common;
     requires io.helidon.builder;
     requires io.helidon.builder.config;
+    requires io.helidon.common.features.api;
+    requires io.helidon.common.features;
     requires io.helidon.common.task;
 
     requires java.management;
@@ -48,7 +50,6 @@ module io.helidon.nima.webserver {
     requires jakarta.annotation;
     requires io.helidon.common.uri;
 
-    requires static io.helidon.common.features.api;
     requires static io.helidon.config.metadata;
 
     // provides multiple packages due to intentional cyclic dependency
