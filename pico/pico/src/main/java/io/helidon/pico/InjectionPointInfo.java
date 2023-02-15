@@ -27,7 +27,7 @@ public interface InjectionPointInfo extends ElementInfo {
     /**
      * The identity (aka id) for this injection point. The id should be unique for the service type it is contained within.
      * <p>
-     * This method will return the {@link #baseIdentity()} when {@link #elementOffset()} is null.  If not null
+     * This method will return the {@link #baseIdentity()} when {@link #elementOffset()} is empty.  If not empty
      * then the elemOffset is part of the returned identity.
      *
      * @return the unique identity
@@ -57,7 +57,7 @@ public interface InjectionPointInfo extends ElementInfo {
     boolean optionalWrapped();
 
     /**
-     * True if the injection point is of type Provider (or Supplier).
+     * True if the injection point is of type {@link jakarta.inject.Provider}.
      *
      * @return true if provider based receiver
      */
