@@ -43,8 +43,15 @@ import io.helidon.common.features.HelidonFeatures;
 import io.helidon.common.features.api.HelidonFlavor;
 import io.helidon.nima.common.tls.Tls;
 import io.helidon.nima.webserver.http.DirectHandlers;
+import io.helidon.nima.webserver.http.HttpFeature;
 import io.helidon.nima.webserver.spi.ServerConnectionSelector;
+import io.helidon.pico.configdriven.ConfiguredBy;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
+@ConfiguredBy(ServerConfig.class)
 class LoomServer implements WebServer {
     private static final System.Logger LOGGER = System.getLogger(LoomServer.class.getName());
     private static final String EXIT_ON_STARTED_KEY = "exit.on.started";
@@ -60,7 +67,23 @@ class LoomServer implements WebServer {
     private volatile List<ListenerFuture> startFutures;
     private volatile boolean alreadyStarted = false;
 
-    LoomServer(Builder builder, DirectHandlers simpleHandlers) {
+    @Inject
+    LoomServer(ServerConfig serverConfig, List<Provider<HttpFeature>> features) {
+        this(WebServer.builder()
+                     .routing(it -> {
+                         features.stream()
+                                 .map(Provider::get)
+                                 .forEach(it::addFeature);
+                     }),
+             serverConfig,
+             DirectHandlers.builder().build());
+    }
+
+    LoomServer(Builder builder, ServerConfig serverConfig, DirectHandlers simpleHandlers) {
+        // this will be modified once we move everything to config driven
+        builder.host(serverConfig.host());
+        builder.port(serverConfig.port());
+
         this.registerShutdownHook = builder.shutdownHook();
         this.context = builder.context();
         ServerContextImpl serverContext = new ServerContextImpl(context,
@@ -114,6 +137,7 @@ class LoomServer implements WebServer {
                                                                           .factory());
     }
 
+    @PostConstruct
     @Override
     public WebServer start() {
         HelidonFeatures.flavor(HelidonFlavor.NIMA);
