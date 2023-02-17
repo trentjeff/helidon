@@ -456,9 +456,7 @@ public class BuilderTypeTools implements TypeInfoCreatorProvider {
                 .elementTypeAnnotations(elementTypeAnnotations)
                 .modifierNames(modifierNames);
 
-        if (defaultValue != null) {
-            builder.defaultValue(defaultValue);
-        }
+        Optional.ofNullable(defaultValue).ifPresent(builder::defaultValue);
 
         return builder.build();
     }
