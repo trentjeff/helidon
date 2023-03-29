@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.helidon.applications</groupId>
         <artifactId>helidon-mp</artifactId>
-        <version>3.1.3-SNAPSHOT</version>
+        <version>3.2.1-SNAPSHOT</version>
         <relativePath>../../../applications/mp/pom.xml</relativePath>
     </parent>
     <groupId>io.helidon.examples.todos</groupId>
@@ -42,6 +42,7 @@
         <version.datastax.driver.core>4.9.0</version.datastax.driver.core>
         <version.datastax.driver.query.builder>4.9.0</version.datastax.driver.query.builder>
         <version.codahale.metrics.core>3.0.2</version.codahale.metrics.core>
+        <version.lib.snakeyaml.override>1.32</version.lib.snakeyaml.override>
     </properties>
 
     <dependencyManagement>
@@ -56,6 +57,11 @@
                         <artifactId>metrics-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${version.lib.snakeyaml.override}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

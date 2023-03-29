@@ -23,10 +23,9 @@
     <parent>
         <groupId>io.helidon.applications</groupId>
         <artifactId>helidon-applications-project</artifactId>
-        <version>3.1.3-SNAPSHOT</version>
+        <version>3.2.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>io.helidon.applications</groupId>
     <artifactId>helidon-applications</artifactId>
     <packaging>pom</packaging>
     <name>Helidon Applications Parent</name>
@@ -180,6 +179,7 @@
                     <executions>
                         <execution>
                             <id>resource-config</id>
+                            <phase>package</phase>
                             <configuration>
                                 <!-- generate records for all module's resources -->
                                 <isDetectionEnabled>true</isDetectionEnabled>
@@ -187,6 +187,7 @@
                         </execution>
                         <execution>
                             <id>build-native-image</id>
+                            <phase>package</phase>
                             <configuration>
                                 <!-- generate an argument file for native image - great for troubleshooting -->
                                 <useArgFile>true</useArgFile>
@@ -210,6 +211,58 @@
         </pluginManagement>
     </build>
     <profiles>
+        <profile>
+            <id>native-image-skip</id>
+            <activation>
+                <property>
+                    <name>native.image.skip</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>resource-config</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>build-native-image</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>native-image-static</id>
+            <activation>
+                <property>
+                    <name>native.image.buildStatic</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>build-native-image</id>
+                                <configuration>
+                                    <buildArgs combine.children="append">
+                                        <arg>--static</arg>
+                                    </buildArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>helidon-cli</id>
             <activation>

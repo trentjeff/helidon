@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.helidon.applications</groupId>
         <artifactId>helidon-applications</artifactId>
-        <version>3.1.3-SNAPSHOT</version>
+        <version>3.2.1-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>helidon-mp</artifactId>
@@ -92,14 +92,12 @@
                                 <goals>
                                     <goal>generateResourceConfig</goal>
                                 </goals>
-                                <phase>package</phase>
                             </execution>
                             <execution>
                                 <id>build-native-image</id>
                                 <goals>
                                     <goal>compile</goal>
                                 </goals>
-                                <phase>package</phase>
                             </execution>
                         </executions>
                     </plugin>
