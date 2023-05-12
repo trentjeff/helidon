@@ -150,17 +150,17 @@ public class DiskSpaceHealthCheck implements HealthCheck {
         return builder().build();
     }
 
-    @Override
+//    @Override
     public HealthCheckType type() {
         return HealthCheckType.LIVENESS;
     }
 
-    @Override
+//    @Override
     public String name() {
         return "diskSpace";
     }
 
-    @Override
+//    @Override
     public String path() {
         return "diskspace";
     }

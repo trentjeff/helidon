@@ -25,6 +25,7 @@ import io.helidon.nima.observe.spi.ObserveProvider;
  */
 @Feature(value = "Health", description = "Health check support", in = HelidonFlavor.NIMA)
 module io.helidon.nima.observe.health {
+    requires static jakarta.annotation;
     requires java.management;
 
     requires transitive io.helidon.health;

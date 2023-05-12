@@ -69,17 +69,17 @@ public class DeadlockHealthCheck implements HealthCheck {
         return create(ManagementFactory.getThreadMXBean());
     }
 
-    @Override
+//    @Override
     public HealthCheckType type() {
         return HealthCheckType.LIVENESS;
     }
 
-    @Override
+//    @Override
     public String name() {
         return NAME;
     }
 
-    @Override
+//    @Override
     public String path() {
         return PATH;
     }
@@ -108,4 +108,3 @@ public class DeadlockHealthCheck implements HealthCheck {
                 .build();
     }
 }
-

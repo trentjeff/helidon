@@ -16,38 +16,17 @@
 
 package io.helidon.health;
 
+import io.helidon.pico.api.Contract;
+
 /**
  * A health check.
  * Health checks are called when a request to health status comes over the wire.
  */
 @FunctionalInterface
-public interface HealthCheck {
-    /**
-     * Type of this health check.
-     *
-     * @return type, defaults to {@link HealthCheckType#LIVENESS}
-     */
-    default HealthCheckType type() {
-        return HealthCheckType.LIVENESS;
-    }
+@Contract
+public interface HealthCheck  {
 
-    /**
-     * Name of this health check, used in output when details are requested.
-     *
-     * @return name of this health check, defaults to simple class name
-     */
-    default String name() {
-        return getClass().getSimpleName();
-    }
-
-    /**
-     * Path of this health check, to support single health-check queries.
-     *
-     * @return path to use, by default returns {@link #name()}
-     */
-    default String path() {
-        return name();
-    }
+//    HealthCheckConfig config();
 
     /**
      * Call a health check.
@@ -55,4 +34,5 @@ public interface HealthCheck {
      * @return health response
      */
     HealthCheckResponse call();
+
 }

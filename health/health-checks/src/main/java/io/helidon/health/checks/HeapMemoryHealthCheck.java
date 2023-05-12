@@ -90,17 +90,17 @@ public class HeapMemoryHealthCheck implements HealthCheck {
         return builder().build();
     }
 
-    @Override
+//    @Override
     public HealthCheckType type() {
         return HealthCheckType.LIVENESS;
     }
 
-    @Override
+//    @Override
     public String name() {
         return "heapMemory";
     }
 
-    @Override
+//    @Override
     public String path() {
         return "heapmemory";
     }

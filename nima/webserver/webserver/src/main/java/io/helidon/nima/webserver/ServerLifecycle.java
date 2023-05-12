@@ -19,6 +19,7 @@ package io.helidon.nima.webserver;
 /**
  * Basic server lifecycle operations.
  */
+// Contract
 public interface ServerLifecycle {
     /**
      * Before server start.

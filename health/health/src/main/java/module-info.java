@@ -18,8 +18,11 @@
  * Helidon health API.
  */
 module io.helidon.health {
+    requires static jakarta.annotation;
     requires transitive io.helidon.common;
     requires transitive io.helidon.common.config;
+    requires io.helidon.builder.config;
+    requires io.helidon.pico.api;
 
     exports io.helidon.health;
     exports io.helidon.health.spi;
