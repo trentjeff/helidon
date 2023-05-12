@@ -14,6 +14,13 @@
 # limitations under the License.
 #
 
+health-check-db:
+    name: "testDbHealth"
+    type: "dml"
+    statement: "DO 0"
+    timeout: 5
+    timeUnit: "seconds"
+
 # Health check with DML statement
 health-check-dml:
     name: "testBuilderDmlFromConfig"

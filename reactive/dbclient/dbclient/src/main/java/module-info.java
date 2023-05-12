@@ -41,6 +41,7 @@ module io.helidon.reactive.dbclient {
     requires transitive io.helidon.common.context;
     requires transitive io.helidon.common.mapper;
     requires transitive io.helidon.common.reactive;
+    requires transitive io.helidon.pico.runtime;
 
     exports io.helidon.reactive.dbclient;
     exports io.helidon.reactive.dbclient.spi;

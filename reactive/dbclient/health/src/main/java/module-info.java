@@ -26,10 +26,14 @@ import io.helidon.common.features.api.HelidonFlavor;
         path = {"DbClient", "Health"}
 )
 module io.helidon.reactive.dbclient.health {
+    requires static jakarta.annotation;
     requires static io.helidon.common.features.api;
 
     requires io.helidon.reactive.dbclient;
     requires io.helidon.health;
+    requires io.helidon.pico.configdriven.api;
+    requires jakarta.inject;
+    requires io.helidon.pico.configdriven.runtime;
 
     exports io.helidon.reactive.dbclient.health;
 }

@@ -25,11 +25,15 @@ import io.helidon.common.reactive.Awaitable;
 import io.helidon.config.Config;
 import io.helidon.health.HealthCheck;
 import io.helidon.health.HealthCheckResponse;
+import io.helidon.pico.configdriven.api.ConfiguredBy;
 import io.helidon.reactive.dbclient.DbClient;
+
+import jakarta.inject.Inject;
 
 /**
  * Database health check.
  */
+@ConfiguredBy(DbHealthCheckConfig.class)
 public abstract class DbClientHealthCheck implements HealthCheck {
 
     /* Local logger instance. */
@@ -38,6 +42,19 @@ public abstract class DbClientHealthCheck implements HealthCheck {
     /* Default hHealth check timeout in seconds (to wait for statement execution response). */
     private static final int DEFAULT_TIMEOUT_SECONDS = 10;
     private final Duration timeout;
+    /* Helidon database client. */
+    private DbClient dbClient;
+    /* Health check name. */
+    private final String name;
+
+
+    @Inject
+    DbClientHealthCheck(DbHealthCheckConfig cfg,
+                        DbClient dbClient) { // TODO: this should be a Provider<DbClient>
+        this.timeout = cfg.timeout();
+        this.name = cfg.name();
+        this.dbClient = dbClient;
+    }
 
     /**
      * Create a health check with configured settings for the database.
@@ -60,11 +77,6 @@ public abstract class DbClientHealthCheck implements HealthCheck {
     public static Builder builder(DbClient dbClient) {
         return new Builder(dbClient);
     }
-
-    /* Helidon database client. */
-    private final DbClient dbClient;
-    /* Health check name. */
-    private final String name;
 
     private DbClientHealthCheck(Builder builder) {
         this.dbClient = builder.database;
@@ -104,7 +116,7 @@ public abstract class DbClientHealthCheck implements HealthCheck {
 
     // Getters for local usage and jUnit tests
 
-    @Override
+//    @Override
     public String name() {
         return name;
     }
@@ -112,6 +124,10 @@ public abstract class DbClientHealthCheck implements HealthCheck {
     Duration timeout() {
         return timeout;
     }
+
+//    DbHealthCheckConfig config() {
+//        return cfg;
+//    }
 
     /**
      * Database health check which calls DBClient's {@code namedDml} method.
