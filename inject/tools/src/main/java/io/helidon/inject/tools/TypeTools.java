@@ -143,7 +143,7 @@ public final class TypeTools {
      * @deprecated switch to using pure annotation processing wherever possible
      */
     @Deprecated
-    static Annotation createAnnotationFromAnnotation(java.lang.annotation.Annotation annotation) {
+    public static Annotation createAnnotationFromAnnotation(java.lang.annotation.Annotation annotation) {
         return Annotation.create(TypeName.create(annotation.annotationType()), extractValues(annotation));
     }
 
@@ -173,7 +173,7 @@ public final class TypeTools {
      * @deprecated switch to use pure annotation processing instead of reflection
      */
     @Deprecated
-    static Map<String, String> extractValues(java.lang.annotation.Annotation annotation) {
+    public static Map<String, String> extractValues(java.lang.annotation.Annotation annotation) {
         Map<String, String> result = new HashMap<>();
 
         Class<? extends java.lang.annotation.Annotation> aClass = annotation.annotationType();

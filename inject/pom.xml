@@ -43,6 +43,7 @@
     <!-- this will show the progression of what has come over, and what is left to come over -->
     <modules>
         <module>api</module>
+        <module>cdi</module>
         <module>configdriven</module>
         <module>tools</module>
         <module>processor</module>

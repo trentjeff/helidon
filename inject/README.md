@@ -123,6 +123,7 @@ Compile-time dependency:
 * [api](./api) - the Injection API and SPI; depends on jakarta-inject and jakarta-annotations. Required as a maven compile-time dependency for runtime consumption.
 * [runtime](./runtime) - contains the default runtime implementation of the Injection API/SPI; depends on the Inject API module above. Requires as a maven compile-time dependency for runtime consumption.
 * [config-driven](./configdriven) - Extensions to Injection to integrate directly with the [Helidon Config](../config) subsystem.
+* [cdi](./cdi): integration of Helidon Injection into your CDI-based application.
 * [tools](./tools) - contains the libraries and template-based codegen mustache resources as well as model validation tooling; depends on runtime services. Only required at build time and is not required for Injection at runtime.
 * [processor](./processor) - contains the libraries for annotation processing; depends on tools. Only required at build time and is not required for Injection at runtime.
 * [maven-plugin](./maven-plugin) - provides code generation Mojo wrappers for maven; depends on tools. Only required at build time and is not required for Injection at runtime. This is what would be used to create your <b>Application</b>.

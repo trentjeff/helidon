@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, 2023 Oracle and/or its affiliates.
+ * Copyright (c) 2020 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,8 @@
  */
 
 /**
- * Injection API module.
+ * Integrates Helidon Injection services/beans and interceptors into CDI.
+ *
+ * @see io.helidon.inject.cdi.CdiExtension
  */
-module io.helidon.inject.api {
-    requires jakarta.inject;
-    requires io.helidon.common.types;
-    requires io.helidon.common;
-    requires io.helidon.common.config;
-    requires transitive io.helidon.builder.api;
-    requires static io.helidon.config.metadata;
-    requires static jakarta.annotation;
-    requires io.helidon.logging.common;
-
-    exports io.helidon.inject.api;
-    exports io.helidon.inject.spi;
-
-    uses io.helidon.inject.spi.InjectionServicesProvider;
-}
+package io.helidon.inject.cdi;

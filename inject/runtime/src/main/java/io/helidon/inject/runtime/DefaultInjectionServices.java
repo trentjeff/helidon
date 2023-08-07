@@ -152,8 +152,8 @@ class DefaultInjectionServices implements InjectionServices, Resettable {
 
     @Override
     public Optional<DefaultServices> services(boolean initialize) {
-        boolean isWriteLock = initialize;
-        Lock lock = (isWriteLock) ? lifecycleLock.writeLock() : lifecycleLock.readLock();
+        // note: isWriteLock = initialize;
+        Lock lock = (initialize) ? lifecycleLock.writeLock() : lifecycleLock.readLock();
         lock.lock();
         try {
             if (!initialize) {

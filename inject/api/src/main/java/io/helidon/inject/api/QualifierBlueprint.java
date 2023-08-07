@@ -27,7 +27,7 @@ import io.helidon.common.types.TypeName;
 import jakarta.inject.Named;
 
 /**
- * Represents a qualifier annotation (a specific case of annotations, annotated with {@link jakarta.inject.Qualifier}.
+ * Represents a qualifier annotation (a specific case of annotations, annotated with {@link jakarta.inject.Qualifier}).
  *
  * @see jakarta.inject.Qualifier
  * @see CommonQualifiers

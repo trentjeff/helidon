@@ -9,8 +9,3 @@ This subproject contains [CDI portable extensions](http://docs.jboss.org/cdi/spe
 
 * [Jedis Client](jedis-cdi): inject [Jedis](https://github.com/xetorthio/jedis#jedis)
   client objects into your CDI-based application.
-
-* [Oracle Cloud Infrastructure Object Storage](oci-objectstorage-cdi): inject an
-  [OCI Object Storage](https://cloud.oracle.com/storage/object-storage/features)
-  client into your CDI-based application.
-

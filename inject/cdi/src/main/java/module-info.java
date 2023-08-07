@@ -15,20 +15,11 @@
  */
 
 /**
- * Injection API module.
+ * Injection CDI module.
  */
-module io.helidon.inject.api {
+module io.helidon.inject.cdi {
+    requires jakarta.cdi;
     requires jakarta.inject;
-    requires io.helidon.common.types;
-    requires io.helidon.common;
-    requires io.helidon.common.config;
-    requires transitive io.helidon.builder.api;
-    requires static io.helidon.config.metadata;
-    requires static jakarta.annotation;
-    requires io.helidon.logging.common;
-
-    exports io.helidon.inject.api;
-    exports io.helidon.inject.spi;
-
-    uses io.helidon.inject.spi.InjectionServicesProvider;
+    requires java.logging;
+    requires transitive io.helidon.inject.configdriven.runtime;
 }

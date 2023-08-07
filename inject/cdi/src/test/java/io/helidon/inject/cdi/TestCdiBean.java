@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, 2023 Oracle and/or its affiliates.
+ * Copyright (c) 2023 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-/**
- * Injection API module.
- */
-module io.helidon.inject.api {
-    requires jakarta.inject;
-    requires io.helidon.common.types;
-    requires io.helidon.common;
-    requires io.helidon.common.config;
-    requires transitive io.helidon.builder.api;
-    requires static io.helidon.config.metadata;
-    requires static jakarta.annotation;
-    requires io.helidon.logging.common;
+package io.helidon.inject.cdi;
 
-    exports io.helidon.inject.api;
-    exports io.helidon.inject.spi;
+import jakarta.enterprise.context.ApplicationScoped;
 
-    uses io.helidon.inject.spi.InjectionServicesProvider;
+@SuppressWarnings("unused")
+@ApplicationScoped
+public class TestCdiBean implements TestBean {
+
+    @Override
+    public String name() {
+        return "TestCdiBean";
+    }
+
 }
