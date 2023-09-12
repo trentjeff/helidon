@@ -16,11 +16,10 @@
 
 package io.helidon.tests.integration.restclient;
 
+import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.client.WebTarget;
-
-import io.helidon.microprofile.tests.junit5.HelidonTest;
 import org.eclipse.microprofile.metrics.Counter;
 import org.eclipse.microprofile.metrics.MetricID;
 import org.eclipse.microprofile.metrics.MetricRegistry;
@@ -66,5 +65,15 @@ class MainTest {
         // Verify that @Retry code was executed by looking at counter
         counter = registry.getCounters().get(metricID);
         assertThat(counter.getCount(), is(2L));
+    }
+
+    @Test
+    void testHelloWorldAsync() {
+        JsonObject jsonObject = target
+                .path("proxy")
+                .path("async")
+                .request()
+                .get(JsonObject.class);
+        assertThat(jsonObject.getString("message"), is("Hello World!"));
     }
 }

@@ -50,37 +50,6 @@
    <vulnerabilityName>CVE-2021-0341</vulnerabilityName>
 </suppress>
 
-<!-- False Positive. This is a CVE again Payara. This is generating a number of false positives.
-     See  https://github.com/jeremylong/DependencyCheck/issues/4781 for one example
--->
-<suppress>
-   <notes><![CDATA[
-   file name: jakarta.resource-api-2.0.0.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/jakarta\.resource/jakarta\.resource\-api@.*$</packageUrl>
-   <cve>CVE-2022-37422</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: microprofile-jwt-auth-api-2.0.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.eclipse\.microprofile\.jwt/microprofile\-jwt\-auth\-api@.*$</packageUrl>
-   <cve>CVE-2022-37422</cve>
-</suppress>
-
-<!-- 
-     We use SafeConstructor() or an even more limited custom constructor so this CVE does not apply.
-     SnakeYaml maintainer has closed their issue as "will not fix".
-     https://bitbucket.org/snakeyaml/snakeyaml/issues/561/cve-2022-1471-vulnerability-in
--->
-<suppress>
-   <notes><![CDATA[
-   file name: snakeyaml-1.32.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-   <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
-</suppress>
-
 <!-- False Positive. This CVE is against graphql-java, not the microprofile-graphql-api
 -->
 <suppress>
@@ -91,48 +60,15 @@
    <cve>CVE-2022-37734</cve>
 </suppress>
 
-<!-- False Postive. This CVE is against the kafka server. This is the kafka client
+<!-- False Positive. This CVE is against graphql-java, not graphql-java-dataloader
+     See https://github.com/jeremylong/DependencyCheck/issues/5641
 -->
 <suppress>
    <notes><![CDATA[
-   file name: kafka-clients-2.8.1.jar
+   file name: java-dataloader-3.1.0.jar
    ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka\-clients@.*$</packageUrl>
-   <cve>CVE-2022-34917</cve>
-</suppress>
-
-<!-- False Postives. CVE CVE-2022-45129 is against Payara not jakarta.resource-api nor microprofile
- -->
-<suppress>
-   <notes><![CDATA[
-   file name: jakarta.resource-api-2.0.0.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/jakarta\.resource/jakarta\.resource\-api@.*$</packageUrl>
-   <cve>CVE-2022-45129</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: microprofile-config-api-3.0.1.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.eclipse\.microprofile\.config/microprofile\-config\-api@.*$</packageUrl>
-   <cve>CVE-2022-45129</cve>
-</suppress>
-<suppress>
-   <notes><![CDATA[
-   file name: microprofile-jwt-auth-api-2.0.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.eclipse\.microprofile\.jwt/microprofile\-jwt\-auth\-api@.*$</packageUrl>
-   <cve>CVE-2022-45129</cve>
-</suppress>
-
-<!-- False Positive. CVE-2023-25194 is against Kafka Connect, not the client -->
-<!-- See https://github.com/jeremylong/DependencyCheck/issues/5469 -->
-<suppress>
-   <notes><![CDATA[
-   file name: kafka-clients-2.8.1.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka\-clients@.*$</packageUrl>
-   <cve>CVE-2023-25194</cve>
+   <packageUrl regex="true">^pkg:maven/com\.graphql\-java/java\-dataloader@.*$</packageUrl>
+   <cve>CVE-2023-28867</cve>
 </suppress>
 
 <!-- False Positive. This CVE is against H2 1.x.
@@ -154,6 +90,36 @@
    ]]></notes>
    <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
    <vulnerabilityName>CVE-2020-8908</vulnerabilityName>
+</suppress>
+
+<!-- False Positive. This does not apply to server Java deployment and certainly not to our use of graalvm SDK.
+    This vulnerability applies to Java deployments, typically in clients running sandboxed
+    Java Web Start applications or sandboxed Java applets, that load and run untrusted code
+    (e.g., code that comes from the internet) and rely on the Java sandbox for security. This
+    vulnerability does not apply to Java deployments, typically in servers, that load and run only trusted code 
+-->
+<suppress>
+   <notes><![CDATA[
+   file name: graal-sdk-22.3.0.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/org\.graalvm\.sdk/graal\-sdk@.*$</packageUrl>
+   <vulnerabilityName>CVE-2023-22006</vulnerabilityName>
+</suppress>
+
+<!-- 
+    This CVE is being disputed by the Jackson project and the community seems in agreement that this
+    CVE should be rejected. We are suppressing this for now to reduce noise in our scan and will
+    continue to monitor progress.
+    https://nvd.nist.gov/vuln/detail/CVE-2023-35116
+    https://github.com/FasterXML/jackson-databind/issues/3972
+
+-->
+<suppress>
+   <notes><![CDATA[
+   file name: jackson-databind-2.15.2.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+   <cve>CVE-2023-35116</cve>
 </suppress>
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021 Oracle and/or its affiliates.
+ * Copyright (c) 2018, 2023 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,7 +174,7 @@ public class FaultToleranceExtension implements Extension {
         final Config config = ConfigProvider.getConfig();
         Optional<Integer> priority = config.getOptionalValue(MP_FT_INTERCEPTOR_PRIORITY, Integer.class);
         priority.ifPresent(v -> event.configureAnnotatedType()
-                .remove(a -> a instanceof Priority)
+                .remove(Priority.class::isInstance)
                 .add(new LiteralPriority(v)));
     }
 

@@ -549,7 +549,7 @@ public abstract class OpenAPISupport implements Service {
 
         RequestHeaders headers = req.headers();
         if (headers.acceptedTypes().isEmpty()) {
-            headers.add(Http.Header.ACCEPT, DEFAULT_RESPONSE_MEDIA_TYPE.toString());
+            return Optional.of(DEFAULT_RESPONSE_MEDIA_TYPE);
         }
         return headers
                 .bestAccepted(preferredMediaTypeOrdering);
@@ -933,7 +933,7 @@ public abstract class OpenAPISupport implements Service {
          */
         protected Supplier<List<? extends IndexView>> indexViewsSupplier() {
             // Only in MP can we have possibly multiple index views, one per app, from scanning classes (or the Jandex index).
-            return () -> Collections.emptyList();
+            return Collections::emptyList;
         }
 
         private OpenApiStaticFile getExplicitStaticFile() {

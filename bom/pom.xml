@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.helidon</groupId>
         <artifactId>helidon-parent</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <groupId>io.helidon</groupId>
@@ -32,7 +32,7 @@
     <name>Helidon BOM POM</name>
 
     <properties>
-        <helidon.version>3.2.1-SNAPSHOT</helidon.version>
+        <helidon.version>3.2.3-SNAPSHOT</helidon.version>
     </properties>
 
     <dependencyManagement>
@@ -631,6 +631,11 @@
                 <artifactId>helidon-common-crypto</artifactId>
                 <version>${helidon.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.helidon.common.testing</groupId>
+                <artifactId>helidon-common-testing-junit5</artifactId>
+                <version>${helidon.version}</version>
+            </dependency>
 
             <!-- db client -->
             <dependency>
@@ -900,6 +905,16 @@
             <dependency>
                 <groupId>io.helidon.integrations.oci.sdk</groupId>
                 <artifactId>helidon-integrations-oci-sdk-cdi</artifactId>
+                <version>${helidon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.helidon.integrations.oci.sdk</groupId>
+                <artifactId>helidon-integrations-oci-sdk-runtime</artifactId>
+                <version>${helidon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.helidon.integrations.oci</groupId>
+                <artifactId>helidon-integrations-oci-secrets-configsource</artifactId>
                 <version>${helidon.version}</version>
             </dependency>
             <dependency>

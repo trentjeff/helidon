@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.helidon.archetypes</groupId>
         <artifactId>helidon-archetypes-project</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
     <packaging>helidon-archetype</packaging>
     <artifactId>helidon</artifactId>
@@ -55,6 +55,16 @@
                         <exec src="flavor.xml"/>
                     </entrypoint>
                     <inputFiltersFile>filters.properties</inputFiltersFile>
+                    <validations>
+                        <validation>
+                            <match>any</match>
+                            <fail>true</fail>
+                            <patterns>
+                                <pattern>**/*.mustache</pattern>
+                                <pattern>**/__pkg__/**</pattern>
+                            </patterns>
+                        </validation>
+                    </validations>
                 </configuration>
             </plugin>
             <plugin>

@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.helidon.tests</groupId>
         <artifactId>helidon-tests-project</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <groupId>io.helidon.tests.integration</groupId>
@@ -60,6 +60,8 @@
         <module>restclient</module>
         <module>oidc</module>
         <module>gh-5792</module>
+        <module>se-gh-6845</module>
+        <module>gh-6970</module>
     </modules>
 
     <profiles>

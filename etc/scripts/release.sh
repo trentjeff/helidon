@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2018, 2022 Oracle and/or its affiliates.
+# Copyright (c) 2018, 2023 Oracle and/or its affiliates.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,6 +49,9 @@ $(basename ${0}) [ --build-number=N ] CMD
         Perform a release build
         This will create a local branch, deploy artifacts and push a tag
 
+    deploy_snapshot
+        Perform a snapshot build and deploy to snapshot repository
+
 EOF
 }
 
@@ -66,7 +69,7 @@ for ((i=0;i<${#ARGS[@]};i++))
         exit 0
         ;;
     *)
-        if [ "${ARG}" = "update_version" ] || [ "${ARG}" = "release_build" ] ; then
+        if [ "${ARG}" = "update_version" ] || [ "${ARG}" = "release_build" ] || [ "${ARG}" = "deploy_snapshot" ] ; then
             readonly COMMAND="${ARG}"
         else
             echo "ERROR: unknown argument: ${ARG}"
@@ -121,6 +124,7 @@ update_version(){
     # Hack to update helidon.version
     for pom in `egrep "<helidon.version>.*</helidon.version>" -r . --include pom.xml | cut -d ':' -f 1 | sort | uniq `
     do
+        echo "Updating helidon.version property in ${pom} to ${FULL_VERSION}"
         cat ${pom} | \
             sed -e s@'<helidon.version>.*</helidon.version>'@"<helidon.version>${FULL_VERSION}</helidon.version>"@g \
             > ${pom}.tmp
@@ -130,6 +134,7 @@ update_version(){
     # Hack to update helidon.version in build.gradle files
     for bfile in `egrep "helidonversion = .*" -r . --include build.gradle | cut -d ':' -f 1 | sort | uniq `
     do
+        echo "Updating helidonversion property in ${bfile} to ${FULL_VERSION}"
         cat ${bfile} | \
             sed -e s@'helidonversion = .*'@"helidonversion = \'${FULL_VERSION}\'"@g \
             > ${bfile}.tmp
@@ -139,8 +144,25 @@ update_version(){
     # Hack to update helidon-version in doc files
     for dfile in `egrep ":helidon-version: .*" -r . --include attributes.adoc | cut -d ':' -f 1 | sort | uniq `
     do
+        echo "Updating helidon-version property in ${dfile} to ${FULL_VERSION}"
         cat ${dfile} | \
             sed -e s@':helidon-version: .*'@":helidon-version: ${FULL_VERSION}"@g \
+            > ${dfile}.tmp
+        mv ${dfile}.tmp ${dfile}
+    done
+
+    # Hack to update helidon-version-is-release in doc files
+    # We are a released version if we are not a SNAPSHOT version
+    if [[ ${HELIDON_VERSION} == *-SNAPSHOT ]]; then
+        readonly IS_RELEASED="false"
+    else
+        readonly IS_RELEASED="true"
+    fi
+    for dfile in `egrep ":helidon-version-is-release: .*" -r . --include attributes.adoc | cut -d ':' -f 1 | sort | uniq `
+    do
+        echo "Updating helidon-version-is-release property in ${dfile} to ${IS_RELEASED}"
+        cat ${dfile} | \
+            sed -e s@':helidon-version-is-release: .*'@":helidon-version-is-release: ${IS_RELEASED}"@g \
             > ${dfile}.tmp
         mv ${dfile}.tmp ${dfile}
     done
@@ -239,15 +261,35 @@ release_build(){
       -DstagingRepositoryId="${STAGING_REPO_ID}" \
       -DstagingDescription="${STAGING_DESC}"
 
-    # Create and push a git tag
-    local GIT_REMOTE=$(git config --get remote.origin.url | \
-        sed "s,https://\([^/]*\)/,git@\1:,")
-
-    git remote add release "${GIT_REMOTE}" > /dev/null 2>&1 || \
-    git remote set-url release "${GIT_REMOTE}"
-
     git tag -f "${FULL_VERSION}"
-    git push --force release refs/tags/"${FULL_VERSION}":refs/tags/"${FULL_VERSION}"
+    git push --force origin refs/tags/"${FULL_VERSION}":refs/tags/"${FULL_VERSION}"
+}
+
+deploy_snapshot(){
+
+    # Make sure version ends in -SNAPSHOT
+    if [[ ${MVN_VERSION} != *-SNAPSHOT ]]; then
+        echo "Helidon version ${MVN_VERSION} is not a SNAPSHOT version. Failing snapshot release."
+        exit 1
+    fi
+
+    readonly NEXUS_SNAPSHOT_URL="https://oss.sonatype.org/content/repositories/snapshots/"
+    echo "Deploying snapshot build ${MVN_VERSION} to ${NEXUS_SNAPSHOT_URL}"
+
+    # The nexus-staging-maven-plugin had issues deploying the module
+    # helidon-applications because the distributionManagement section is empty.
+    # So we deploy using the apache maven-deploy-plugin and altDeploymentRepository
+    # property. The deployAtEnd option requires version 3.0.0 of maven-deploy-plugin
+    # or newer to work correctly on multi-module systems
+    set -x
+    mvn ${MAVEN_ARGS} -e clean deploy \
+      -Parchetypes \
+      -DskipTests \
+      -DaltDeploymentRepository="ossrh::${NEXUS_SNAPSHOT_URL}" \
+      -DdeployAtEnd=true \
+      -DretryFailedDeploymentCount="10"
+
+    echo "Done. ${MVN_VERSION} deployed to ${NEXUS_SNAPSHOT_URL}"
 }
 
 # Invoke command

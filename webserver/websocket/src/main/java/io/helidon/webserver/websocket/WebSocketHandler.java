@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Oracle and/or its affiliates.
+ * Copyright (c) 2022, 2023 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
     private final TyrusServerContainer tyrusServerContainer;
     private volatile Connection connection;
     private final WebSocketEngine.UpgradeInfo upgradeInfo;
-    private final BufferedEmittingPublisher<ByteBuffer> emitter;
+    private final BufferedEmittingPublisher<ByteBuf> emitter;
 
     WebSocketHandler(ChannelHandlerContext ctx, String path,
                             FullHttpRequest upgradeRequest,
@@ -147,6 +147,10 @@ class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        if (connection != null) {
+            connection.close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, "Client connection closed"));
+        }
+
         tyrusServerContainer.shutdown();
         super.channelUnregistered(ctx);
     }
@@ -154,16 +158,18 @@ class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof ByteBuf byteBuf) {
-            emitter.emit(byteBuf.copy().nioBuffer());
+            emitter.emit(byteBuf.copy());
         }
     }
 
-    private void sendBytesToTyrus(ChannelHandlerContext ctx, ByteBuffer nioBuffer) {
+    private void sendBytesToTyrus(ChannelHandlerContext ctx, ByteBuf byteBuf) {
         // Pass all data to Tyrus spi
+        ByteBuffer nioBuffer = byteBuf.nioBuffer();
         int retries = MAX_RETRIES;
         while (nioBuffer.remaining() > 0 && retries-- > 0) {
             connection.getReadHandler().handle(nioBuffer);
         }
+        byteBuf.release();
 
         // If we can't push all data to Tyrus, cancel and report problem
         if (retries == 0) {
@@ -223,17 +229,17 @@ class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                 return ctx;
             }, webSocketRouting.getExecutorService()).thenAccept(c -> Multi.create(emitter)
                     .observeOn(webSocketRouting.getExecutorService())
-                    .forEach(byteBuffer -> sendBytesToTyrus(c, byteBuffer))
+                    .forEach(byteBuf -> sendBytesToTyrus(c, byteBuf))
                     .onError(this::logError)
             );
         } else {
             this.connection = upgradeInfo.createConnection(writer, WebSocketHandler::close);
             Multi.create(emitter)
-                    .forEach(byteBuffer -> sendBytesToTyrus(ctx, byteBuffer))
+                    .forEach(byteBuf -> sendBytesToTyrus(ctx, byteBuf))
                     .onError(this::logError);
         }
 
-
+        ctx.channel().config().setAutoRead(true);
     }
 
     private void logError(Throwable throwable){

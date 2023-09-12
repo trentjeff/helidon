@@ -25,7 +25,7 @@
     <parent>
         <groupId>io.helidon.grpc</groupId>
         <artifactId>helidon-grpc-project</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>helidon-grpc-core</artifactId>
@@ -71,6 +71,10 @@
                     <groupId>io.grpc</groupId>
                     <artifactId>grpc-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.google.j2objc</groupId>
+                    <artifactId>j2objc-annotations</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -98,6 +102,10 @@
                 <exclusion>
                     <groupId>io.grpc</groupId>
                     <artifactId>grpc-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.j2objc</groupId>
+                    <artifactId>j2objc-annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

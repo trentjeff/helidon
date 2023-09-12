@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.helidon</groupId>
         <artifactId>helidon-project</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
     <groupId>io.helidon.common</groupId>
     <artifactId>helidon-common-project</artifactId>
@@ -41,5 +41,6 @@
         <module>mapper</module>
         <module>media-type</module>
         <module>crypto</module>
+        <module>testing</module>
     </modules>
 </project>

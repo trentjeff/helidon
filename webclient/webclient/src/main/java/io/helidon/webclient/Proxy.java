@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, 2022 Oracle and/or its affiliates.
+ * Copyright (c) 2020, 2023 Oracle and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -426,8 +426,8 @@ public class Proxy {
 
         @Override
         public Proxy build() {
-            if ((null == host) || (host.isEmpty() && (null == systemSelector))) {
-                return NO_PROXY;
+            if ((host == null || host.isEmpty()) && systemSelector == null) {
+                useSystemSelector(true);
             }
             return new Proxy(this);
         }
