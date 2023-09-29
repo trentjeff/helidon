@@ -90,19 +90,19 @@
         <version.lib.jaxb-core>3.0.2</version.lib.jaxb-core>
         <version.lib.jaxb-impl>3.0.2</version.lib.jaxb-impl>
         <version.lib.jboss.classfilewriter>1.2.5.Final</version.lib.jboss.classfilewriter>
-        <version.lib.jboss.logging>3.4.2.Final</version.lib.jboss.logging>
+        <version.lib.jboss.logging>3.5.3.Final</version.lib.jboss.logging>
         <version.lib.jboss.transaction-spi>7.6.1.Final</version.lib.jboss.transaction-spi>
         <!-- Force upgrade version used by maven-jaxb2-plugin. Needed to support Java 16 -->
         <version.lib.jaxb-runtime>3.0.2</version.lib.jaxb-runtime>
         <version.lib.jedis>3.6.3</version.lib.jedis>
         <version.lib.jersey>3.0.11</version.lib.jersey>
-        <version.lib.jgit>5.11.1.202105131744-r</version.lib.jgit>
+        <version.lib.jgit>6.7.0.202309050840-r</version.lib.jgit>
         <version.lib.jsonp-impl>2.0.1</version.lib.jsonp-impl>
         <version.lib.junit>5.7.0</version.lib.junit>
         <version.lib.kafka>3.4.0</version.lib.kafka>
         <!-- Force upgrade of snappy. This should be removed once kafka-clients is upgraded -->
-        <!-- to 3.4.2 or newer. See https://issues.apache.org/jira/browse/KAFKA-15096 -->
-        <version.lib.snappy>1.1.10.1</version.lib.snappy>
+        <!-- See https://issues.apache.org/jira/browse/KAFKA-15498 -->
+        <version.lib.snappy>1.1.10.5</version.lib.snappy>
         <version.lib.log4j>2.17.1</version.lib.log4j>
         <version.lib.logback>1.2.10</version.lib.logback>
         <version.lib.mariadb-java-client>2.6.2</version.lib.mariadb-java-client>
@@ -129,7 +129,7 @@
         <version.lib.mssql-jdbc>8.4.1.jre8</version.lib.mssql-jdbc>
         <version.lib.mysql-connector-java>8.0.28</version.lib.mysql-connector-java>
         <version.lib.narayana>5.12.0.Final</version.lib.narayana>
-        <version.lib.neo4j>4.4.11</version.lib.neo4j>
+        <version.lib.neo4j>5.12.0</version.lib.neo4j>
         <version.lib.netty>4.1.94.Final</version.lib.netty>
         <version.lib.netty-io_uring>0.0.19.Final</version.lib.netty-io_uring>
         <version.lib.oci>3.21.0</version.lib.oci>
@@ -1040,7 +1040,7 @@
             <!-- Neo4j -->
             <dependency>
                 <groupId>org.neo4j.driver</groupId>
-                <artifactId>neo4j-java-driver-slim</artifactId>
+                <artifactId>neo4j-java-driver</artifactId>
                 <version>${version.lib.neo4j}</version>
             </dependency>
             <!-- Cron utils -->
